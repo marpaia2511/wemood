@@ -12,14 +12,15 @@
       <!-- Rechte Seite: Notfall-Button & Einstellungen -->
       <div class="flex items-center gap-2 sm:gap-4">
 
-        <!-- Notfall-Hilfe Button (nicht funktional) -->
+        <!-- Notfall-Hilfe Button -->
         <button
+            @click="$emit('openEmergency')"
             class="px-3 sm:px-6 py-2 bg-red-500 text-white text-sm sm:text-base rounded-full hover:bg-red-600 transition-colors"
         >
           Notfall-Hilfe
         </button>
 
-        <!-- Einstellungen Icon (nicht funktional) -->
+        <!-- Einstellungen Icon -->
         <router-link
             to="/settings"
             class="p-2 sm:p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
@@ -98,8 +99,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-const router = useRouter()
 import { Search as SearchIcon, Settings as SettingsIcon, ChevronDown as ChevronDownIcon } from 'lucide-vue-next'
+
+const router = useRouter()
+
+defineEmits(['openEmergency'])
 
 const searchQuery = ref('')
 const selectedEmotions = ref([])
