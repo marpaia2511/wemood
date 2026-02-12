@@ -50,20 +50,20 @@
         >
           <div class="group bg-white border border-gray-200 rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-lg transition-all cursor-pointer h-full">
 
-            <!-- Bild/Icon Bereich -->
+            <!-- Bild/Emoji Bereich -->
             <div class="relative h-40 sm:h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
               <div class="text-5xl sm:text-7xl group-hover:scale-110 transition-transform duration-300">
                 {{ item.emoji }}
               </div>
 
-              <!-- Typ Badge -->
+              <!-- Artikel Icon -->
               <div class="absolute top-3 sm:top-4 right-3 sm:right-4 p-2 sm:p-2.5 bg-gray-700 rounded-full text-white">
-                <component :is="getTypeIcon(item.type)" class="w-4 h-4 sm:w-5 sm:h-5" />
+                <FileTextIcon class="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
 
-              <!-- Dauer Badge -->
+              <!-- Lesezeit Badge -->
               <div class="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-200 rounded-full text-xs sm:text-sm text-gray-700">
-                {{ item.duration }}
+                {{ item.readTime }}
               </div>
             </div>
 
@@ -74,7 +74,7 @@
               </h3>
               <p class="text-gray-500 mb-3 sm:mb-4 text-xs sm:text-sm">{{ item.description }}</p>
               <div class="flex items-center justify-between">
-                <span class="text-xs sm:text-sm text-gray-500 capitalize font-medium">{{ item.type }}</span>
+                <span class="text-xs sm:text-sm text-gray-500 font-medium">Artikel</span>
                 <span class="text-gray-500 group-hover:translate-x-2 transition-transform text-xs sm:text-sm">
                   Entdecken →
                 </span>
@@ -93,9 +93,7 @@ import {
   ChevronUp as ChevronUpIcon,
   Search as SearchIcon,
   Sparkles as SparklesIcon,
-  Play,
-  Headphones,
-  FileText
+  FileText as FileTextIcon
 } from 'lucide-vue-next'
 
 const searchQuery = ref('')
@@ -103,74 +101,65 @@ const searchQuery = ref('')
 const mediaItems = [
   {
     id: 1,
-    type: 'video',
     title: 'Achtsamkeit für Anfänger',
     description: 'Lerne die Grundlagen der Achtsamkeit',
-    duration: '12:45',
+    readTime: '5 Min. Lesezeit',
     emoji: '🧘‍♀️'
   },
   {
     id: 2,
-    type: 'audio',
     title: 'Geführte Meditation',
     description: 'Entspanne deinen Geist',
-    duration: '15:30',
+    readTime: '6 Min. Lesezeit',
     emoji: '🎧'
   },
   {
     id: 3,
-    type: 'text',
     title: 'Umgang mit Stress',
     description: 'Praktische Tipps für den Alltag',
-    duration: '5 Min. Lesezeit',
+    readTime: '5 Min. Lesezeit',
     emoji: '📖'
   },
   {
     id: 4,
-    type: 'video',
     title: 'Emotionen verstehen',
     description: 'Was sagen uns unsere Gefühle?',
-    duration: '18:20',
+    readTime: '7 Min. Lesezeit',
     emoji: '💭'
   },
   {
     id: 5,
-    type: 'audio',
     title: 'Schlaf-Meditation',
     description: 'Für einen erholsamen Schlaf',
-    duration: '20:00',
+    readTime: '8 Min. Lesezeit',
     emoji: '🌙'
   },
   {
     id: 6,
-    type: 'text',
     title: 'Selbstfürsorge Rituale',
     description: 'Tägliche Routinen für dein Wohlbefinden',
-    duration: '7 Min. Lesezeit',
+    readTime: '7 Min. Lesezeit',
     emoji: '✨'
   },
   {
     id: 7,
-    type: 'video',
     title: 'Angst bewältigen',
     description: 'Strategien gegen Angststörungen',
-    duration: '25:10',
+    readTime: '10 Min. Lesezeit',
     emoji: '🌈'
   },
   {
     id: 8,
-    type: 'audio',
     title: 'Positive Affirmationen',
     description: 'Stärke dein Selbstvertrauen',
-    duration: '10:15',
+    readTime: '4 Min. Lesezeit',
     emoji: '💪'
   },
   {
     id: 9,
-    type: 'text',
     title: 'Resilienz aufbauen',
     description: 'Wie du Krisen besser meisterst',
-    duration: '8 Min. Lesezeit',
+    readTime: '8 Min. Lesezeit',
     emoji: '🌺'
   }
 ]
@@ -183,13 +172,4 @@ const filteredItems = computed(() => {
       item.description.toLowerCase().includes(query)
   )
 })
-
-function getTypeIcon(type) {
-  switch (type) {
-    case 'video': return Play
-    case 'audio': return Headphones
-    case 'text': return FileText
-    default: return null
-  }
-}
 </script>
