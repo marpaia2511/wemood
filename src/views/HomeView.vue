@@ -16,7 +16,7 @@
         <button
             class="px-3 sm:px-6 py-2 bg-red-500 text-white text-sm sm:text-base rounded-full hover:bg-red-600 transition-colors"
         >
-          Notfall-Hilfe
+          NotWfall-Hilfe
         </button>
 
         <!-- Einstellungen Icon (noch nicht funktional) -->
@@ -75,18 +75,19 @@
           </button>
         </div>
 
-        <!-- Bibliothek Button (noch nicht funktional) -->
+        <!-- Bibliothek Button -->
         <div class="flex flex-col items-center gap-3 sm:gap-4">
-          <button
+          <router-link
+              to="/library"
               class="px-8 sm:px-12 py-3 sm:py-4 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
           >
             <span class="text-base sm:text-lg text-gray-700">Bibliothek</span>
-          </button>
+          </router-link>
 
           <!-- Pfeil nach unten -->
-          <div class="bg-white border border-gray-300 rounded-full p-2">
+          <router-link to="/library" class="bg-white border border-gray-300 rounded-full p-2 hover:bg-gray-100 transition-colors">
             <ChevronDownIcon class="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
-          </div>
+          </router-link>
         </div>
       </div>
     </div>
