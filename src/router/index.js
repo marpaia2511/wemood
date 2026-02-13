@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import LibraryView from '../views/LibraryView.vue'
 import SearchResultView from '../views/SearchResultView.vue'
 import SettingsView from '../views/SettingsView.vue'
+import ArticleDetailView from '../views/ArticleDetailView.vue'
 
 const routes = [
     {
@@ -24,6 +25,11 @@ const routes = [
         path: '/settings',
         name: 'settings',
         component: SettingsView
+    },
+    {
+        path: '/article/:id',
+        name: 'article',
+        component: ArticleDetailView
     }
 ]
 

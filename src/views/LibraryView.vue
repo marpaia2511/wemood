@@ -42,9 +42,10 @@
     <!-- Grid Layout -->
     <div class="max-w-6xl mx-auto">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 pb-12">
-        <div
+        <router-link
             v-for="(item, index) in filteredItems"
             :key="item.id"
+            :to="'/article/' + item.id"
             class="transform hover:scale-105 transition-all duration-300 animate-fade-in-up"
             :style="{ animationDelay: index * 0.1 + 's' }"
         >
@@ -81,7 +82,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </router-link>
       </div>
     </div>
   </div>
