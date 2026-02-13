@@ -31,9 +31,10 @@
           <h3 class="text-lg sm:text-xl text-gray-700 mb-3 sm:mb-4">Relevante Themen für dich:</h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <button
+            <router-link
                 v-for="topic in detectedTopics"
                 :key="topic.id"
+                :to="'/article/' + topic.articleId"
                 class="group bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-gray-100 transition-all text-left"
             >
               <!-- Thema Header -->
@@ -55,7 +56,7 @@
               <div class="mt-3 sm:mt-4 text-gray-500 group-hover:translate-x-2 transition-transform text-sm">
                 Mehr erfahren →
               </div>
-            </button>
+            </router-link>
           </div>
         </div>
 
@@ -79,12 +80,14 @@ import { ArrowLeft as ArrowLeftIcon } from 'lucide-vue-next'
 const detectedTopics = [
   {
     id: 1,
+    articleId: 2,
     name: 'Trauer',
     emoji: '😢',
     description: 'Verstehe und verarbeite deine Trauer mit bewährten Methoden'
   },
   {
     id: 2,
+    articleId: 3,
     name: 'Stress',
     emoji: '😰',
     description: 'Lerne effektive Strategien zur Stressbewältigung'
