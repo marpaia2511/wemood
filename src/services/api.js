@@ -111,17 +111,31 @@ export async function getArticleById(id) {
  * Since end-users authenticate via Supabase (separate system),
  * we use the public /search/ endpoint with a broad query instead.
  *
+ * Results are cached in memory so repeated visits don't re-trigger
+ * the Mistral AI analysis pipeline.
+ *
  * Maps → shape LibraryView expects: { id, title, description, emoji, readTime }
  */
-export async function getAllArticles() {
-  const data = await apiFetch(`/search/?q=psychologie`)
-  return (data.results || []).map(r => ({
+let _libraryCache = null
+let _libraryCacheTime = 0
+const LIBRARY_CACHE_TTL = 30 * 60 * 1000 // 30 minutes
+
+export async function getAllArticles({ forceRefresh = false } = {}) {
+  const now = Date.now()
+  if (!forceRefresh && _libraryCache && (now - _libraryCacheTime) < LIBRARY_CACHE_TTL) {
+    return _libraryCache
+  }
+
+  const data = await apiFetch(`/search/?q=alle`)
+  _libraryCache = (data.results || []).map(r => ({
     id:          r.id,
     title:       r.title,
     description: r.summary || '',
     emoji:       categoryToEmoji(r.category),
     readTime:    estimateReadTime(null)
   }))
+  _libraryCacheTime = now
+  return _libraryCache
 }
 
 // ── Mappers ───────────────────────────────────────────────────────────
