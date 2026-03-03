@@ -19,11 +19,16 @@
 import { supabase } from '../lib/supabase.js'
 
 // ── Backend base URL ──────────────────────────────────────────────────
-const BACKEND = (import.meta.env.VITE_BACKEND_URL || '') + '/api/v1'
+const BACKEND = (import.meta.env.VITE_BACKEND_URL || 'https://164-92-243-35.sslip.io') + '/api/v1'
 
 // ── Fetch wrapper for Mario's FastAPI ─────────────────────────────────
 async function apiFetch(path, options = {}) {
-  const res = await fetch(`${BACKEND}${path}`, {
+  // FastAPI requires trailing slash before query params.
+  // Ensure /search?q=x becomes /search/?q=x
+  const normalised = path.replace(/\?/, (match, offset, str) => {
+    return str[offset - 1] === '/' ? match : '/?' 
+  })
+  const res = await fetch(`${BACKEND}${normalised}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
   })
