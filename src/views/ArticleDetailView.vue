@@ -21,8 +21,8 @@
 
     <template v-else>
 
-      <!-- Home Button -->
-      <div class="flex justify-center mb-6 sm:mb-8">
+      <!-- Top Bar -->
+      <div class="flex items-center justify-between mb-6 sm:mb-8 max-w-5xl mx-auto">
         <button
             @click="goBack"
             class="flex items-center gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
@@ -31,6 +31,15 @@
             <ChevronUpIcon class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
           </div>
           <span class="text-base sm:text-lg text-gray-700">Zurück</span>
+        </button>
+        <button
+            @click="toggleFavorite"
+            :disabled="favLoading"
+            class="p-2.5 sm:p-3 bg-white border rounded-full transition-all"
+            :class="favorited ? 'border-red-300 hover:bg-red-50' : 'border-gray-300 hover:bg-gray-100'"
+            :title="favorited ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'"
+        >
+          <HeartIcon class="w-5 h-5 sm:w-6 sm:h-6 transition-all" :class="favorited ? 'fill-red-500 text-red-500' : 'text-gray-500'" />
         </button>
       </div>
 
@@ -200,6 +209,7 @@ import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeft as ArrowLeftIcon,
   ChevronUp as ChevronUpIcon,
+  Heart as HeartIcon,
   ChevronRight as ChevronRightIcon,
   BookOpen as BookOpenIcon,
   PlayCircle as PlayCircleIcon,
@@ -207,7 +217,7 @@ import {
   Loader as LoaderIcon,
   AlertCircle as AlertCircleIcon
 } from 'lucide-vue-next'
-import { getArticleById } from '../services/api.js'
+import { getArticleById, trackArticleView, addFavorite, removeFavorite, isFavorited } from '../services/api.js'
 
 const route           = useRoute()
 const router          = useRouter()
@@ -216,6 +226,8 @@ const currentScreen   = ref(0)
 const loading         = ref(true)
 const error           = ref(null)
 const article         = ref({})
+const favorited       = ref(false)
+const favLoading      = ref(false)
 
 const screens = ['Überblick', 'Literatur', 'Videos', 'Fazit']
 
@@ -224,12 +236,32 @@ onMounted(async () => {
     const id = Number(route.params.id)
     article.value = await getArticleById(id)
     if (!article.value) throw new Error('Artikel nicht gefunden.')
+    trackArticleView({ articleId: id, articleTitle: article.value.title, articleEmoji: article.value.emoji }).catch(() => {})
+    isFavorited(id).then(v => { favorited.value = v }).catch(() => {})
   } catch (e) {
     error.value = e.message
   } finally {
     loading.value = false
   }
 })
+
+async function toggleFavorite() {
+  if (favLoading.value) return
+  favLoading.value = true
+  try {
+    if (favorited.value) {
+      await removeFavorite(article.value.id)
+      favorited.value = false
+    } else {
+      await addFavorite({ articleId: article.value.id, articleTitle: article.value.title, articleEmoji: article.value.emoji })
+      favorited.value = true
+    }
+  } catch (e) {
+    console.warn('Favorite toggle failed:', e.message)
+  } finally {
+    favLoading.value = false
+  }
+}
 
 function onScroll() {
   if (!scrollContainer.value) return

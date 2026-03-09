@@ -130,9 +130,9 @@ export async function getAllArticles({ forceRefresh = false } = {}) {
   _libraryCache = (data.results || []).map(r => ({
     id:          r.id,
     title:       r.title,
-    description: r.summary || '',
-    emoji:       categoryToEmoji(r.category),
-    readTime:    estimateReadTime(null)
+    description: r.summary || r.ai_analysis?.summary || r.content?.slice(0, 120) + '…' || '',
+    emoji:       categoryToEmoji(r.category || r.ai_analysis?.category),
+    readTime:    estimateReadTime(r.content)
   }))
   _libraryCacheTime = now
   return _libraryCache
@@ -155,18 +155,34 @@ function mapFullArticle(r) {
   if (!r) return null
   const a = r.ai_analysis || {}
 
-  const paragraphs = (r.content || '').split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
-  const overview   = paragraphs.slice(0, 2).join('\n\n') || a.summary || ''
-  const conclusion = paragraphs.at(-1) || a.summary || ''
+  // Full content as overview, fall back to ai summary
+  const overview = r.content?.trim() || a.summary || ''
 
-  // Scientific disciplines → numbered facts
-  const facts = (a.scientific_disciplines || []).map(d => `Wissenschaftliche Disziplin: ${d}`)
+  // Fazit: use dedicated fazit field if available, otherwise ai summary (not a content duplicate)
+  const conclusion = r.fazit?.trim() || a.summary || ''
 
-  // Top AI tags → key takeaways
-  const takeaways = (a.tags || []).slice(0, 8)
+  // Facts: scientific disciplines without redundant prefix label
+  const facts = (a.scientific_disciplines || [])
 
-  // Source → literature entry
-  const literature = r.source ? [{ title: r.source, author: 'Quelle', description: r.url || '' }] : []
+  // Takeaways: filter out short acronym-style tags, keep meaningful ones
+  const takeaways = (a.tags || []).filter(t => t.length > 4).slice(0, 8)
+
+  // Literature: prefer dedicated field, fall back to sources array or single source
+  let literature = []
+  if (Array.isArray(r.literature) && r.literature.length) {
+    literature = r.literature
+  } else if (Array.isArray(r.sources) && r.sources.length) {
+    literature = r.sources.map(src => ({
+      title:       src,
+      author:      r.publication_date ? `Veröffentlicht: ${r.publication_date}` : 'Quelle',
+      description: r.url || ''
+    }))
+  } else if (r.source) {
+    literature = [{ title: r.source, author: 'Quelle', description: r.url || '' }]
+  }
+
+  // Videos: use dedicated videos field if available, else empty
+  const videos = Array.isArray(r.videos) && r.videos.length ? r.videos : []
 
   return {
     id:         r.id,
@@ -176,10 +192,10 @@ function mapFullArticle(r) {
     overview,
     facts,
     literature,
-    videos:     [],
+    videos,
     conclusion,
     takeaways,
-    source:     r.source,
+    source:     r.sources?.[0] || r.source,
     url:        r.url,
     tags:       a.tags || [],
     sentiment:  a.sentiment,
@@ -258,4 +274,73 @@ export async function getMoodHistory({ from = null, to = null, limit = 50 } = {}
   const { data, error } = await q
   throwIfError(error)
   return data || []
+}
+// ─────────────────────────────────────────────────────────────────────
+// FAVORITES  →  Supabase
+// Table: favorites (id, user_id, article_id, article_title, article_emoji, created_at)
+// ─────────────────────────────────────────────────────────────────────
+
+export async function addFavorite({ articleId, articleTitle, articleEmoji }) {
+  const { data, error } = await supabase
+    .from('favorites')
+    .insert({ article_id: articleId, article_title: articleTitle, article_emoji: articleEmoji })
+    .select()
+    .single()
+  if (error && error.code !== '23505') throwIfError(error)
+  return data
+}
+
+export async function removeFavorite(articleId) {
+  const { error } = await supabase.from('favorites').delete().eq('article_id', articleId)
+  throwIfError(error)
+}
+
+export async function getFavorites() {
+  const { data, error } = await supabase
+    .from('favorites')
+    .select('id, article_id, article_title, article_emoji, created_at')
+    .order('created_at', { ascending: false })
+  throwIfError(error)
+  return data || []
+}
+
+export async function isFavorited(articleId) {
+  const { data, error } = await supabase
+    .from('favorites')
+    .select('id')
+    .eq('article_id', articleId)
+    .maybeSingle()
+  if (error) return false
+  return !!data
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// ARTICLE HISTORY  →  Supabase
+// Table: article_history (id, user_id, article_id, article_title, article_emoji, viewed_at)
+// ─────────────────────────────────────────────────────────────────────
+
+export async function trackArticleView({ articleId, articleTitle, articleEmoji }) {
+  // Upsert: update viewed_at if already exists, insert otherwise
+  const { error } = await supabase
+    .from('article_history')
+    .upsert(
+      { article_id: articleId, article_title: articleTitle, article_emoji: articleEmoji, viewed_at: new Date().toISOString() },
+      { onConflict: 'user_id,article_id' }
+    )
+  if (error) console.warn('[history] Could not track view:', error.message)
+}
+
+export async function getArticleHistory({ limit = 30 } = {}) {
+  const { data, error } = await supabase
+    .from('article_history')
+    .select('id, article_id, article_title, article_emoji, viewed_at')
+    .order('viewed_at', { ascending: false })
+    .limit(limit)
+  throwIfError(error)
+  return data || []
+}
+
+export async function clearArticleHistory() {
+  const { error } = await supabase.from('article_history').delete().neq('id', 0)
+  throwIfError(error)
 }

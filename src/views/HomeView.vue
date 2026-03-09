@@ -104,9 +104,11 @@
               placeholder="Suche nach Themen..."
               :class="[
                 'w-full bg-white border rounded-full px-6 sm:px-8 py-3 sm:py-5 pr-28 sm:pr-32 text-base sm:text-lg placeholder:text-gray-400 text-gray-800 outline-none transition-all duration-300',
-                sensitiveDetected
-                  ? 'border-red-300 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus:border-red-400'
-                  : 'border-gray-300 focus:border-gray-500 focus:shadow-md'
+                searchError
+                  ? 'border-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.15)] focus:border-orange-400'
+                  : sensitiveDetected
+                    ? 'border-red-300 shadow-[0_0_0_3px_rgba(239,68,68,0.12)] focus:border-red-400'
+                    : 'border-gray-300 focus:border-gray-500 focus:shadow-md'
               ]"
             />
             <button
@@ -117,6 +119,11 @@
               <span class="hidden sm:inline">Suchen</span>
             </button>
           </div>
+          <Transition name="fade-slide">
+            <p v-if="searchError" class="text-sm text-orange-500 mt-2 ml-4">
+              Bitte gib etwas ein, bevor du suchst 🔍
+            </p>
+          </Transition>
         </form>
 
         <!-- Emotion Filter Tags -->
@@ -165,6 +172,7 @@ const { currentUser, isLoggedIn } = useAuth()
 defineEmits(['openEmergency'])
 
 const searchQuery = ref('')
+const searchError = ref(false)
 const selectedEmotions = ref([])
 const bannerDismissed = ref(false)
 
@@ -210,14 +218,23 @@ function toggleEmotion(emotion) {
 }
 
 function handleSearch() {
+  if (!searchQuery.value.trim()) {
+    searchError.value = true
+    setTimeout(() => { searchError.value = false }, 2500)
+    return
+  }
+  searchError.value = false
   router.push({
     name: 'search',
-    query: { q: searchQuery.value || 'mental health', emotions: selectedEmotions.value.join(',') }
+    query: { q: searchQuery.value.trim(), emotions: selectedEmotions.value.join(',') }
   })
 }
 </script>
 
 <style scoped>
+.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.25s ease; }
+.fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateY(-4px); }
+
 .banner-slide-enter-active { animation: bannerIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1); }
 .banner-slide-leave-active { animation: bannerOut 0.25s ease-in forwards; }
 
