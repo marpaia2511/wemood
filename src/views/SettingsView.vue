@@ -1,135 +1,118 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen px-4 sm:px-6 py-6 sm:py-8">
 
     <!-- Top Bar -->
-    <div class="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6">
-      <div class="flex items-center gap-3 sm:gap-4">
-        <router-link
-            to="/"
-            class="p-2 sm:p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
-        >
-          <ArrowLeftIcon class="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-        </router-link>
-        <h1 class="text-2xl sm:text-3xl font-quicksand font-semibold text-gray-800">
-          Einstellungen
-        </h1>
-      </div>
-      <div class="text-xl sm:text-2xl font-quicksand font-semibold text-gray-800">
-        WeMood
+    <div class="flex items-center justify-between mb-6 sm:mb-8 max-w-5xl mx-auto">
+      <router-link
+          to="/"
+          class="flex flex-col items-center gap-1 group transition-opacity hover:opacity-85"
+      >
+        <ChevronUpIcon class="nav-icon-dark w-9 h-9 sm:w-10 sm:h-10 text-white/90 stroke-[2.5] group-hover:text-white transition-colors" />
+        <span class="nav-label-dark text-xl sm:text-2xl font-quicksand text-white font-bold group-hover:text-white transition-colors">
+          Zurück
+        </span>
+      </router-link>
+      <h1 class="text-2xl sm:text-3xl font-quicksand font-bold text-gray-800 nav-label">
+        Einstellungen
+      </h1>
+      <div class="text-xl sm:text-2xl font-quicksand font-bold text-gray-800 nav-label">
+        ⚙️
       </div>
     </div>
 
-    <!-- Inhalt -->
-    <div class="px-4 sm:px-8 py-4 sm:py-6 max-w-5xl mx-auto space-y-4">
+    <div class="px-0 py-4 sm:py-6 max-w-5xl mx-auto space-y-4">
 
       <!-- Konto -->
-      <div class="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-full flex items-center justify-center">
+      <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 glass-subtle rounded-full flex items-center justify-center">
             <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
           </div>
-          <h2 class="text-xl sm:text-2xl font-semibold text-gray-800">Konto</h2>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-800 nav-label">Konto</h2>
         </div>
 
         <!-- Logged in -->
         <router-link
           v-if="isLoggedIn"
           to="/account"
-          class="flex items-center justify-between group p-3 sm:p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors"
+          class="flex items-center justify-between group p-3 sm:p-4 glass-subtle rounded-2xl hover:bg-white/25 transition-colors"
         >
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center">
+            <div class="w-10 h-10 bg-gray-800/80 rounded-xl flex items-center justify-center">
               <span class="text-base font-bold text-white font-quicksand">{{ currentUser?.avatar }}</span>
             </div>
             <div>
-              <p class="text-sm font-semibold text-gray-800">{{ currentUser?.name }}</p>
-              <p class="text-xs text-gray-400">{{ currentUser?.email }}</p>
+              <p class="text-sm font-semibold text-gray-800 nav-label-dark">{{ currentUser?.name }}</p>
+              <p class="text-xs text-gray-500 nav-label-dark">{{ currentUser?.email }}</p>
             </div>
           </div>
-          <ChevronRightIcon class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+          <ChevronRightIcon class="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
         </router-link>
 
         <!-- Guest -->
         <div v-else class="flex flex-col sm:flex-row gap-3">
           <router-link
             to="/login"
-            class="flex-1 py-3 text-center bg-gray-800 hover:bg-gray-900 text-white text-sm font-medium rounded-2xl transition-colors"
+            class="flex-1 py-3 text-center glass hover:bg-white/30 text-gray-800 font-bold text-sm rounded-2xl transition-all nav-label"
           >
             Anmelden
           </router-link>
           <router-link
             to="/register"
-            class="flex-1 py-3 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-2xl transition-colors"
+            class="flex-1 py-3 text-center glass-subtle hover:bg-white/25 text-gray-700 text-sm font-medium rounded-2xl transition-all nav-label-dark"
           >
             Registrieren
           </router-link>
         </div>
       </div>
 
-      <!-- Erscheinungsbild -->
-      <div class="bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
+      <!-- Emotions-Theme + Erscheinungsbild in einer Karte -->
+      <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8">
 
-        <!-- Überschrift -->
+        <!-- Emotions-Theme -->
         <div class="flex items-center gap-3 mb-6">
-          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-full flex items-center justify-center">
-            <PaletteIcon class="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+          <div class="w-10 h-10 sm:w-12 sm:h-12 glass-subtle rounded-full flex items-center justify-center">
+            <PaletteIcon class="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
           </div>
-          <h2 class="text-xl sm:text-2xl font-semibold text-gray-800">Erscheinungsbild</h2>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-800 nav-label">Emotions-Theme</h2>
         </div>
 
-        <!-- Farbschema -->
-        <div class="mb-6">
-          <label class="text-base sm:text-lg text-gray-800 mb-3 block font-medium">Farbschema</label>
-          <div class="grid grid-cols-2 gap-3">
-            <button
-                v-for="scheme in colorSchemes"
-                :key="scheme.value"
-                @click="colorScheme = scheme.value"
-                :class="[
-                'p-3 sm:p-4 border-2 rounded-xl sm:rounded-2xl transition-all',
-                colorScheme === scheme.value
-                  ? 'border-gray-700 bg-gray-100'
-                  : 'border-gray-200 bg-white hover:bg-gray-50'
-              ]"
-            >
-              <div
-                  class="w-full h-10 sm:h-12 rounded-lg sm:rounded-xl mb-2"
-                  :class="scheme.gradient"
-              ></div>
-              <p class="text-sm sm:text-base text-gray-700">{{ scheme.label }}</p>
-            </button>
-          </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
+          <button
+              v-for="theme in emotionThemes"
+              :key="theme.value"
+              @click="currentTheme = theme.value"
+              :class="[
+              'p-3 sm:p-4 border-2 rounded-xl sm:rounded-2xl transition-all text-left',
+              currentTheme === theme.value
+                ? 'border-violet-600 bg-white/25 shadow-md'
+                : 'border-white/20 glass-subtle hover:bg-white/25'
+            ]"
+          >
+            <div
+                class="w-full h-8 sm:h-10 rounded-lg sm:rounded-xl mb-2"
+                :style="{ background: theme.preview }"
+            />
+            <p class="text-xs sm:text-sm text-gray-700 font-medium nav-label-dark">
+              {{ theme.emoji }} {{ theme.label }}
+            </p>
+          </button>
         </div>
 
-        <!-- Helligkeit -->
-        <div class="mb-6">
-          <div class="flex items-center justify-between mb-3">
-            <label class="text-base sm:text-lg text-gray-800 flex items-center gap-2 font-medium">
-              <SunIcon class="w-4 h-4 sm:w-5 sm:h-5" />
-              Helligkeit
-            </label>
-            <span class="text-sm sm:text-base text-gray-600">{{ brightness }}%</span>
-          </div>
-          <input
-              type="range"
-              min="0"
-              max="100"
-              v-model.number="brightness"
-              class="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:sm:w-6 [&::-webkit-slider-thumb]:sm:h-6 [&::-webkit-slider-thumb]:bg-gray-700 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-          />
-        </div>
+        <!-- Divider -->
+        <div class="border-t border-white/20 mb-6"></div>
 
-        <!-- Dunkelmodus -->
-        <div class="flex items-center justify-between p-3 sm:p-4 bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl">
+        <!-- Dark Mode -->
+        <div class="flex items-center justify-between p-3 sm:p-4 glass-subtle rounded-xl sm:rounded-2xl mb-4">
           <div class="flex items-center gap-3">
-            <MoonIcon class="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-            <span class="text-base sm:text-lg text-gray-800">Dunkelmodus</span>
+            <MoonIcon class="w-5 h-5 text-gray-600" />
+            <span class="text-base sm:text-lg text-gray-700 font-semibold nav-label">Dunkelmodus</span>
           </div>
           <button
               @click="darkMode = !darkMode"
               :class="[
               'w-12 sm:w-14 h-6 sm:h-7 rounded-full transition-all relative',
-              darkMode ? 'bg-gray-700' : 'bg-gray-300'
+              darkMode ? 'bg-violet-600' : 'bg-violet-300'
             ]"
           >
             <div
@@ -137,36 +120,80 @@
                 'w-4 sm:w-5 h-4 sm:h-5 bg-white rounded-full transition-all absolute top-1',
                 darkMode ? 'right-1' : 'left-1'
               ]"
-            ></div>
+            />
           </button>
         </div>
+
+        <!-- Reduzierte Animationen -->
+        <div class="flex items-center justify-between p-3 sm:p-4 glass-subtle rounded-xl sm:rounded-2xl">
+          <div class="flex items-center gap-3">
+            <EyeIcon class="w-5 h-5 text-gray-600" />
+            <div>
+              <span class="text-base sm:text-lg text-gray-700 font-semibold nav-label block">Reduzierte Animationen</span>
+              <span class="text-xs text-gray-500">Deaktiviert alle Hintergrund-Animationen</span>
+            </div>
+          </div>
+          <button
+              @click="reducedMotion = !reducedMotion"
+              :class="[
+              'w-12 sm:w-14 h-6 sm:h-7 rounded-full transition-all relative',
+              reducedMotion ? 'bg-violet-600' : 'bg-violet-300'
+            ]"
+          >
+            <div
+                :class="[
+                'w-4 sm:w-5 h-4 sm:h-5 bg-white rounded-full transition-all absolute top-1',
+                reducedMotion ? 'right-1' : 'left-1'
+              ]"
+            />
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { inject } from 'vue'
 import {
-  ArrowLeft as ArrowLeftIcon,
+  ChevronUp as ChevronUpIcon,
+  ChevronRight as ChevronRightIcon,
   Palette as PaletteIcon,
-  Sun as SunIcon,
   Moon as MoonIcon,
+  Eye as EyeIcon,
   User as UserIcon,
-  ChevronRight as ChevronRightIcon
 } from 'lucide-vue-next'
 import { useAuth } from '../composables/useAuth.js'
 
 const { currentUser, isLoggedIn } = useAuth()
 
-const brightness = ref(80)
-const darkMode = ref(false)
-const colorScheme = ref('orange-lavender')
+const currentTheme  = inject('currentTheme')
+const darkMode      = inject('darkMode')
+const reducedMotion = inject('reducedMotion')
 
-const colorSchemes = [
-  { value: 'orange-lavender', label: 'Orange-Lavender', gradient: 'bg-gradient-to-r from-orange-400 to-purple-400' },
-  { value: 'blue-pink', label: 'Blau-Rosa', gradient: 'bg-gradient-to-r from-blue-400 to-pink-400' },
-  { value: 'green-teal', label: 'Grün-Türkis', gradient: 'bg-gradient-to-r from-green-400 to-teal-400' },
-  { value: 'sunset', label: 'Sonnenuntergang', gradient: 'bg-gradient-to-r from-orange-500 to-red-400' }
+const emotionThemes = [
+  { value: 'default',      label: 'Standard',      emoji: '🎨', preview: 'linear-gradient(135deg, #C4B5FD, #FDBA74, #A78BFA, #FB923C)' },
+  { value: 'joy',          label: 'Freude',         emoji: '😊', preview: 'linear-gradient(135deg, #FDE68A, #FDBA74, #FEF9C3, #FB923C)' },
+  { value: 'trust',        label: 'Vertrauen',      emoji: '🤝', preview: 'linear-gradient(135deg, #5EEAD4, #7DD3FC, #6EE7B7)' },
+  { value: 'anxiety',      label: 'Angst',          emoji: '😨', preview: 'linear-gradient(135deg, #A5B4FC, #C4B5FD, #93C5FD)' },
+  { value: 'surprise',     label: 'Überraschung',   emoji: '😮', preview: 'linear-gradient(135deg, #FDE68A, #F9A8D4, #93C5FD)' },
+  { value: 'depression',   label: 'Depression',     emoji: '😢', preview: 'linear-gradient(135deg, #FDE68A, #6EE7B7, #A7F3D0)' },
+  { value: 'anger',        label: 'Wut',            emoji: '😠', preview: 'linear-gradient(135deg, #FDA4AF, #FDBA74, #F9A8D4)' },
+  { value: 'anticipation', label: 'Vorfreude',      emoji: '🤩', preview: 'linear-gradient(135deg, #FB923C, #FDE68A, #C4B5FD)' },
+  { value: 'love',         label: 'Liebe',          emoji: '❤️', preview: 'linear-gradient(135deg, #F9A8D4, #FECDD3, #FDA4AF)' },
+  { value: 'resilience',   label: 'Resilienz',      emoji: '💪', preview: 'linear-gradient(135deg, #A7F3D0, #FDE68A, #D1FAE5)' },
+  { value: 'gratitude',    label: 'Dankbarkeit',    emoji: '🙏', preview: 'linear-gradient(135deg, #FEF3C7, #FED7AA, #FDE68A)' },
+  { value: 'mindfulness',  label: 'Achtsamkeit',    emoji: '🧘', preview: 'linear-gradient(135deg, #A7F3D0, #99F6E4, #6EE7B7)' },
+  { value: 'focus',        label: 'Fokus',          emoji: '🎯', preview: 'linear-gradient(135deg, #93C5FD, #FDBA74, #BAE6FD)' },
+  { value: 'sleep',        label: 'Schlaf',         emoji: '🌙', preview: 'linear-gradient(135deg, #312E81, #1E1B4B, #4C1D95)' },
+  { value: 'calm',         label: 'Ruhe',           emoji: '☁️', preview: 'linear-gradient(135deg, #A7F3D0, #C4B5FD, #6EE7B7)' },
+  { value: 'hope',         label: 'Hoffnung',       emoji: '🌱', preview: 'linear-gradient(135deg, #A7F3D0, #FEF3C7, #99F6E4)' },
 ]
 </script>
+
+<style scoped>
+.nav-label-dark { text-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 0 8px rgba(0,0,0,0.15); }
+.nav-label      { text-shadow: 0 1px 4px rgba(255,255,255,0.6), 0 0 12px rgba(255,255,255,0.4); }
+.nav-icon-dark  { filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)); }
+</style>
