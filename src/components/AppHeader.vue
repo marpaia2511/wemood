@@ -41,9 +41,19 @@
       </button>
 
       <router-link
+          to="/account"
+          class="p-2.5 sm:p-3 glass-subtle rounded-full
+               hover:bg-white/25 transition-colors"
+          title="Mein Konto"
+      >
+        <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+      </router-link>
+
+      <router-link
           to="/settings"
           class="p-2.5 sm:p-3 glass-subtle rounded-full
                hover:bg-white/25 transition-colors"
+          title="Einstellungen"
       >
         <SettingsIcon class="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
       </router-link>
@@ -52,7 +62,7 @@
 </template>
 
 <script setup>
-import { Settings as SettingsIcon } from 'lucide-vue-next'
+import { Settings as SettingsIcon, User as UserIcon } from 'lucide-vue-next'
 defineEmits(['openEmergency'])
 </script>
 

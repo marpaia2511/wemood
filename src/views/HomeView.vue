@@ -120,7 +120,7 @@
               <SparklesIcon class="w-4 h-4 text-gray-500" />
               <span class="text-sm text-gray-600 font-medium nav-label-dark">{{ recommendationLabel }}</span>
             </div>
-            <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <div class="flex gap-3 overflow-x-auto pb-3 suggestions-scroll">
               <router-link
                 v-for="rec in recommendations" :key="rec.id"
                 :to="'/article/' + rec.id"
@@ -390,4 +390,19 @@ onBeforeUnmount(() => {
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Suggestions scroll row — thin, rounded scrollbar */
+.suggestions-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(160,130,220,0.4) transparent;
+}
+.suggestions-scroll::-webkit-scrollbar { height: 4px; }
+.suggestions-scroll::-webkit-scrollbar-track { background: transparent; }
+.suggestions-scroll::-webkit-scrollbar-thumb {
+  background: rgba(160,130,220,0.45);
+  border-radius: 99px;
+}
+.suggestions-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(140,110,200,0.65);
+}
 </style>

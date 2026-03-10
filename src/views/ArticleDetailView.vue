@@ -236,7 +236,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ChevronUp as ChevronUpIcon,
@@ -253,6 +253,34 @@ import { getArticleById, trackArticleView, addFavorite, removeFavorite, isFavori
 
 const route   = useRoute()
 const router  = useRouter()
+const currentTheme = inject('currentTheme')
+
+// ── Map article category/tags → AnimatedBackground theme name ────────
+function categoryToTheme(article) {
+  const cat  = (article.category || '').toLowerCase()
+  const tags = (article.tags || []).join(' ').toLowerCase()
+  const haystack = cat + ' ' + tags
+
+  if (haystack.includes('depress'))                            return 'depression'
+  if (haystack.includes('angst') || haystack.includes('anx')) return 'anxiety'
+  if (haystack.includes('stress') || haystack.includes('anger') || haystack.includes('wut')) return 'anger'
+  if (haystack.includes('schlaf') || haystack.includes('sleep'))                             return 'sleep'
+  if (haystack.includes('mindful') || haystack.includes('achtsamkeit'))                      return 'mindfulness'
+  if (haystack.includes('resilienz') || haystack.includes('resilience'))                     return 'resilience'
+  if (haystack.includes('love') || haystack.includes('liebe') || haystack.includes('beziehung') || haystack.includes('relationship')) return 'love'
+  if (haystack.includes('trauma'))                            return 'calm'
+  if (haystack.includes('selbst') || haystack.includes('self') || haystack.includes('esteem')) return 'trust'
+  if (haystack.includes('focus') || haystack.includes('konzentr'))                           return 'focus'
+  if (haystack.includes('hoffnung') || haystack.includes('hope'))                            return 'hope'
+  if (haystack.includes('dankbar') || haystack.includes('gratit'))                           return 'gratitude'
+  if (haystack.includes('freude') || haystack.includes('joy') || haystack.includes('glück'))  return 'joy'
+  if (haystack.includes('vertrauen') || haystack.includes('trust'))                          return 'trust'
+  // sentiment-based fallback
+  const sentiment = (article.sentiment || '').toLowerCase()
+  if (sentiment === 'positive') return 'hope'
+  if (sentiment === 'negative') return 'depression'
+  return 'calm'
+}
 
 const screens       = ['Überblick', 'Literatur', 'Videos', 'Fazit']
 const currentScreen = ref(0)
@@ -262,18 +290,31 @@ const article       = ref({})
 const favorited     = ref(false)
 const favLoading    = ref(false)
 const scrollContainer = ref(null)
+let previousTheme = null
 
 onMounted(async () => {
   try {
     const id = Number(route.params.id)
     article.value = await getArticleById(id)
     if (!article.value) throw new Error('Artikel nicht gefunden.')
+    // Save current theme and apply article theme
+    if (currentTheme) {
+      previousTheme = currentTheme.value
+      currentTheme.value = categoryToTheme(article.value)
+    }
     trackArticleView({ articleId: id, articleTitle: article.value.title, articleEmoji: article.value.emoji }).catch(() => {})
     isFavorited(id).then(v => { favorited.value = v }).catch(() => {})
   } catch (e) {
     error.value = e.message
   } finally {
     loading.value = false
+  }
+})
+
+onUnmounted(() => {
+  // Restore previous theme when leaving the article
+  if (currentTheme && previousTheme !== null) {
+    currentTheme.value = previousTheme
   }
 })
 
