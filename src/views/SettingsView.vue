@@ -1,14 +1,24 @@
 <template>
-  <div class="min-h-screen px-4 sm:px-6 py-6 sm:py-8">
+  <!--
+    SettingsView.vue – 16 Emotions-Themes, Dark Mode, Reduzierte Animationen.
+
+    Quellen:
+    - Vue 3 provide/inject: https://vuejs.org/guide/components/provide-inject.html
+    - CSS backdrop-filter: https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter
+  -->
+  <div class="min-h-screen">
 
     <!-- Top Bar -->
-    <div class="flex items-center justify-between mb-6 sm:mb-8 max-w-5xl mx-auto">
+    <div class="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6">
       <router-link
           to="/"
-          class="flex flex-col items-center gap-1 group transition-opacity hover:opacity-85"
+          class="flex flex-col items-center gap-1 group
+               transition-opacity hover:opacity-85"
       >
-        <ChevronUpIcon class="nav-icon-dark w-9 h-9 sm:w-10 sm:h-10 text-white/90 stroke-[2.5] group-hover:text-white transition-colors" />
-        <span class="nav-label-dark text-xl sm:text-2xl font-quicksand text-white font-bold group-hover:text-white transition-colors">
+        <ChevronUpIcon class="nav-icon-dark w-9 h-9 sm:w-10 sm:h-10 text-white/90
+                              stroke-[2.5] group-hover:text-white transition-colors" />
+        <span class="nav-label-dark text-xl sm:text-2xl font-quicksand text-white font-bold
+                     group-hover:text-white transition-colors">
           Zurück
         </span>
       </router-link>
@@ -16,11 +26,12 @@
         Einstellungen
       </h1>
       <div class="text-xl sm:text-2xl font-quicksand font-bold text-gray-800 nav-label">
-        ⚙️
+        WeMood
       </div>
     </div>
 
-    <div class="px-0 py-4 sm:py-6 max-w-5xl mx-auto space-y-4">
+    <!-- Inhalt -->
+    <div class="px-4 sm:px-8 py-4 sm:py-6 max-w-5xl mx-auto space-y-4">
 
       <!-- Konto -->
       <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8">
@@ -69,9 +80,10 @@
       <!-- Emotions-Theme + Erscheinungsbild in einer Karte -->
       <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8">
 
-        <!-- Emotions-Theme -->
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-10 h-10 sm:w-12 sm:h-12 glass-subtle rounded-full flex items-center justify-center">
+        <!-- Emotions-Themes -->
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 glass-subtle rounded-full
+                      flex items-center justify-center">
             <PaletteIcon class="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
           </div>
           <h2 class="text-xl sm:text-2xl font-bold text-gray-800 nav-label">Emotions-Theme</h2>
@@ -93,7 +105,7 @@
                 class="w-full h-8 sm:h-10 rounded-lg sm:rounded-xl mb-2"
                 :style="{ background: theme.preview }"
             />
-            <p class="text-xs sm:text-sm text-gray-700 font-medium nav-label-dark">
+            <p class="text-xs sm:text-sm text-gray-600 font-medium">
               {{ theme.emoji }} {{ theme.label }}
             </p>
           </button>
@@ -103,7 +115,8 @@
         <div class="border-t border-white/20 mb-6"></div>
 
         <!-- Dark Mode -->
-        <div class="flex items-center justify-between p-3 sm:p-4 glass-subtle rounded-xl sm:rounded-2xl mb-4">
+        <div class="flex items-center justify-between p-3 sm:p-4
+                    glass-subtle rounded-xl sm:rounded-2xl mb-4">
           <div class="flex items-center gap-3">
             <MoonIcon class="w-5 h-5 text-gray-600" />
             <span class="text-base sm:text-lg text-gray-700 font-semibold nav-label">Dunkelmodus</span>
@@ -125,12 +138,13 @@
         </div>
 
         <!-- Reduzierte Animationen -->
-        <div class="flex items-center justify-between p-3 sm:p-4 glass-subtle rounded-xl sm:rounded-2xl">
+        <div class="flex items-center justify-between p-3 sm:p-4
+                    glass-subtle rounded-xl sm:rounded-2xl">
           <div class="flex items-center gap-3">
             <EyeIcon class="w-5 h-5 text-gray-600" />
             <div>
               <span class="text-base sm:text-lg text-gray-700 font-semibold nav-label block">Reduzierte Animationen</span>
-              <span class="text-xs text-gray-500">Deaktiviert alle Hintergrund-Animationen</span>
+              <span class="text-xs text-gray-400">Deaktiviert alle Hintergrund-Animationen</span>
             </div>
           </div>
           <button
@@ -193,7 +207,20 @@ const emotionThemes = [
 </script>
 
 <style scoped>
-.nav-label-dark { text-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 0 8px rgba(0,0,0,0.15); }
-.nav-label      { text-shadow: 0 1px 4px rgba(255,255,255,0.6), 0 0 12px rgba(255,255,255,0.4); }
-.nav-icon-dark  { filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)); }
+.nav-label-dark {
+  text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 0 8px rgba(0, 0, 0, 0.15);
+}
+.nav-label {
+  text-shadow:
+      0 1px 4px rgba(255, 255, 255, 0.6),
+      0 0 12px rgba(255, 255, 255, 0.4);
+}
+.nav-icon-dark {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+}
+.nav-icon {
+  filter: drop-shadow(0 1px 4px rgba(255, 255, 255, 0.6));
+}
 </style>

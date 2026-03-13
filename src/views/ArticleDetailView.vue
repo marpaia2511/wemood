@@ -21,34 +21,11 @@
 
     <template v-else>
 
-      <!-- Top Bar -->
-      <div class="flex items-center justify-between mb-6 sm:mb-8 max-w-5xl mx-auto">
+      <!-- AppHeader (colleague addition) -->
+      <AppHeader @open-emergency="$emit('openEmergency')" />
 
-        <!-- Zurück -->
-        <button @click="goBack" class="flex flex-col items-center gap-1 group cursor-pointer">
-          <ChevronUpIcon class="w-10 h-10 sm:w-12 sm:h-12 text-white/90 nav-icon-dark stroke-[1.2] group-hover:opacity-100" />
-          <span class="text-xl sm:text-2xl font-quicksand text-white font-bold nav-label-dark group-hover:opacity-100 transition-opacity">
-            Zurück
-          </span>
-        </button>
-
-        <!-- Favorite button -->
-        <button
-            @click="toggleFavorite"
-            :disabled="favLoading"
-            class="p-2.5 sm:p-3 glass rounded-full transition-all"
-            :class="favorited ? 'bg-red-400/20 border-red-300/50' : 'hover:bg-white/25'"
-            :title="favorited ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'"
-        >
-          <HeartIcon
-            class="w-5 h-5 sm:w-6 sm:h-6 transition-all"
-            :class="favorited ? 'fill-red-500 text-red-500' : 'text-gray-500'"
-          />
-        </button>
-      </div>
-
-      <!-- Progress dots -->
-      <div class="flex items-center justify-center gap-3 mb-6 sm:mb-8 max-w-5xl mx-auto">
+      <!-- Fortschrittsanzeige -->
+      <div class="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
         <button
             v-for="(screen, index) in screens"
             :key="index"
@@ -66,17 +43,33 @@
         </button>
       </div>
 
+      <!-- Favorite button (preserved from original — floated top-right) -->
+      <div class="flex justify-end mb-2 max-w-5xl mx-auto">
+        <button
+            @click="toggleFavorite"
+            :disabled="favLoading"
+            class="p-2.5 sm:p-3 glass rounded-full transition-all"
+            :class="favorited ? 'bg-red-400/20 border-red-300/50' : 'hover:bg-white/25'"
+            :title="favorited ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'"
+        >
+          <HeartIcon
+            class="w-5 h-5 sm:w-6 sm:h-6 transition-all"
+            :class="favorited ? 'fill-red-500 text-red-500' : 'text-gray-500'"
+          />
+        </button>
+      </div>
+
       <!-- Card scroll container -->
       <div class="max-w-5xl mx-auto">
         <div
             ref="scrollContainer"
             @scroll="onScroll"
-            class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-6"
-            style="-webkit-overflow-scrolling: touch; scrollbar-width: none;"
+            class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-6
+                   [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
 
           <!-- Card 1: Überblick -->
-          <div class="snap-center flex-shrink-0 w-full">
+          <div class="w-full flex-shrink-0 snap-center">
             <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-10">
 
               <div class="text-center mb-6 sm:mb-8">
@@ -113,7 +106,7 @@
           </div>
 
           <!-- Card 2: Literatur -->
-          <div class="snap-center flex-shrink-0 w-full">
+          <div class="w-full flex-shrink-0 snap-center">
             <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-10">
 
               <div class="text-center mb-6 sm:mb-8">
@@ -152,7 +145,7 @@
           </div>
 
           <!-- Card 3: Videos -->
-          <div class="snap-center flex-shrink-0 w-full">
+          <div class="w-full flex-shrink-0 snap-center">
             <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-10">
 
               <div class="text-center mb-6 sm:mb-8">
@@ -191,7 +184,7 @@
           </div>
 
           <!-- Card 4: Fazit -->
-          <div class="snap-center flex-shrink-0 w-full">
+          <div class="w-full flex-shrink-0 snap-center">
             <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-10">
 
               <div class="text-center mb-6 sm:mb-8">
@@ -213,17 +206,15 @@
                 </div>
               </div>
 
-              <div class="flex justify-between">
-                <button @click="scrollToScreen(2)" class="nav-btn">
-                  <ChevronLeftIcon class="w-4 h-4 text-violet-500" />
-                  <span class="text-sm text-gray-700">Zurück</span>
-                </button>
+              <!-- Colleague: centered back button with ArrowLeft -->
+              <div class="flex justify-center">
                 <button
                     @click="goBack"
-                    class="flex items-center gap-2 px-5 py-2.5 bg-violet-600/90 text-white rounded-full hover:bg-violet-600 transition-colors"
+                    class="flex items-center gap-2 px-5 py-2.5 bg-violet-600/90 text-white
+                           rounded-full hover:bg-violet-600 transition-colors"
                 >
-                  <CheckCircleIcon class="w-4 h-4" />
-                  <span class="text-sm font-semibold">Fertig</span>
+                  <ArrowLeftIcon class="w-4 h-4" />
+                  <span class="text-sm">Zurück</span>
                 </button>
               </div>
             </div>
@@ -231,6 +222,33 @@
 
         </div>
       </div>
+
+      <!-- Desktop: fixed left back button (colleague addition) -->
+      <button
+          @click="goBack"
+          class="hidden lg:flex fixed left-4 top-1/2 -translate-y-1/2 z-40
+                 flex-col items-center gap-1 group cursor-pointer"
+      >
+        <ChevronLeftIcon class="w-14 h-14 text-white/90 nav-icon-dark
+                                stroke-[2.5] group-hover:opacity-100 transition-opacity" />
+        <span class="text-sm font-quicksand text-white font-bold nav-label-dark
+                     group-hover:opacity-100 transition-opacity">
+          Zurück
+        </span>
+      </button>
+
+      <!-- Mobile: inline back button below content (colleague addition) -->
+      <div class="lg:hidden mt-8 sm:mt-10 mb-4">
+        <button @click="goBack" class="flex items-center gap-1.5 group cursor-pointer">
+          <ChevronLeftIcon class="w-10 h-10 text-white/90 nav-icon-dark
+                                  stroke-[2.5] group-hover:opacity-100 transition-opacity" />
+          <span class="text-base font-quicksand text-white font-bold nav-label-dark
+                       group-hover:opacity-100 transition-opacity">
+            Zurück
+          </span>
+        </button>
+      </div>
+
     </template>
   </div>
 </template>
@@ -239,9 +257,9 @@
 import { ref, onMounted, onUnmounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  ChevronUp as ChevronUpIcon,
-  ChevronRight as ChevronRightIcon,
+  ArrowLeft as ArrowLeftIcon,
   ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
   BookOpen as BookOpenIcon,
   PlayCircle as PlayCircleIcon,
   CheckCircle as CheckCircleIcon,
@@ -250,6 +268,9 @@ import {
   AlertCircle as AlertCircleIcon,
 } from 'lucide-vue-next'
 import { getArticleById, trackArticleView, addFavorite, removeFavorite, isFavorited } from '../services/api.js'
+import AppHeader from '../components/AppHeader.vue'
+
+defineEmits(['openEmergency'])
 
 const route   = useRoute()
 const router  = useRouter()

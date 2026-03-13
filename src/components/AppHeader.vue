@@ -1,12 +1,15 @@
 <template>
   <!--
     AppHeader.vue
-    Header mit Logo, Notfall-Hilfe (rötliches Glass), Einstellungen.
+    Header mit Logo, Notfall-Hilfe, Dark-Mode-Toggle, Einstellungen.
 
     Quellen:
     - Vue Router <router-link>: https://router.vuejs.org/guide/
     - Lucide Icons für Vue: https://lucide.dev/guide/packages/lucide-vue-next
     - Tailwind CSS backdrop-blur: https://tailwindcss.com/docs/backdrop-blur
+    - Vue 3 inject(): https://vuejs.org/guide/components/provide-inject.html
+    - Lucide Moon Icon: https://lucide.dev/icons/moon
+    - Lucide Sun Icon: https://lucide.dev/icons/sun
   -->
   <header class="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6">
     <!-- Logo SVG – Liquid Glass -->
@@ -29,7 +32,7 @@
 
     <!-- Rechte Seite -->
     <div class="flex items-center gap-3 sm:gap-5">
-      <!-- Notfall-Hilfe: rötliches Glass, fette Schrift, roter Rahmen -->
+      <!-- Notfall-Hilfe -->
       <button
           @click="$emit('openEmergency')"
           class="notfall-glass px-5 sm:px-7 py-2.5 sm:py-3 rounded-full
@@ -40,6 +43,18 @@
         Notfall-Hilfe
       </button>
 
+      <!-- Dark Mode Toggle (colleague addition) -->
+      <button
+          @click="toggleDarkMode"
+          class="p-2.5 sm:p-3 glass-subtle rounded-full
+               hover:bg-white/25 transition-colors"
+          :title="darkMode ? 'Hellmodus aktivieren' : 'Dunkelmodus aktivieren'"
+      >
+        <SunIcon v-if="darkMode" class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
+        <MoonIcon v-else class="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+      </button>
+
+      <!-- Account link (preserved from original) -->
       <router-link
           to="/account"
           class="p-2.5 sm:p-3 glass-subtle rounded-full
@@ -49,6 +64,7 @@
         <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
       </router-link>
 
+      <!-- Einstellungen -->
       <router-link
           to="/settings"
           class="p-2.5 sm:p-3 glass-subtle rounded-full
@@ -62,15 +78,19 @@
 </template>
 
 <script setup>
-import { Settings as SettingsIcon, User as UserIcon } from 'lucide-vue-next'
+import { inject } from 'vue'
+import { Settings as SettingsIcon, User as UserIcon, Moon as MoonIcon, Sun as SunIcon } from 'lucide-vue-next'
+
 defineEmits(['openEmergency'])
+
+const darkMode = inject('darkMode')
+
+function toggleDarkMode() {
+  darkMode.value = !darkMode.value
+}
 </script>
 
 <style scoped>
-/*
-  Rötliches Glass für Notfall-Hilfe.
-  Leichter Rosa-Ton im Hintergrund, nicht zu kräftig.
-*/
 .notfall-glass {
   background: rgba(254, 205, 211, 0.18);
   backdrop-filter: blur(28px) saturate(180%) brightness(1.04);
