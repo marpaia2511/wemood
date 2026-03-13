@@ -12,14 +12,14 @@
       </div>
 
       <!-- Modal -->
-      <div class="relative w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl z-10 overflow-hidden max-h-[92vh] flex flex-col modal-glass">
+      <div class="relative w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl z-10 overflow-hidden max-h-[92vh] flex flex-col modal-glass-light">
 
         <!-- Top accent bar -->
         <div class="h-1 shrink-0 transition-all duration-1000" :style="{ background: currentMoodGradient }" />
 
         <!-- Drag handle -->
         <div class="flex justify-center pt-3 pb-1 sm:hidden shrink-0">
-          <div class="w-10 h-1 rounded-full" style="background:rgba(255,255,255,0.15)" />
+          <div class="w-10 h-1 rounded-full" style="background:rgba(0,0,0,0.12)" />
         </div>
 
         <!-- Header -->
@@ -30,20 +30,20 @@
               <component :is="currentMoodIcon" class="w-5 h-5 transition-all duration-700" :style="{ color: currentMoodIconColor }" />
             </div>
             <div>
-              <h2 class="text-lg sm:text-xl font-quicksand font-bold text-white leading-tight">
+              <h2 class="text-lg sm:text-xl font-quicksand font-bold leading-tight" style="color:rgba(20,20,35,0.9)">
                 {{ step === 'select' ? 'Wie geht es dir gerade?' : (currentMood?.title ?? 'Notfall-Hilfe') }}
               </h2>
-              <p class="text-xs mt-0.5" style="color:rgba(255,255,255,0.5)">
+              <p class="text-xs mt-0.5" style="color:rgba(20,20,35,0.45)">
                 {{ step === 'select' ? 'Wähle, was dich gerade am meisten beschreibt' : (currentMood?.subtitle ?? '') }}
               </p>
             </div>
           </div>
           <div class="flex items-center gap-1.5">
-            <button @click="toggleSound" class="p-2 rounded-full hover:bg-white/10 transition-colors">
-              <component :is="soundEnabled ? Volume2Icon : VolumeXIcon" class="w-4 h-4" style="color:rgba(255,255,255,0.4)" />
+            <button @click="toggleSound" class="p-2 rounded-full hover:bg-black/8 transition-colors">
+              <component :is="soundEnabled ? Volume2Icon : VolumeXIcon" class="w-4 h-4" style="color:rgba(20,20,35,0.38)" />
             </button>
-            <button @click="close" class="p-2 rounded-full hover:bg-white/10 transition-colors">
-              <XIcon class="w-4 h-4" style="color:rgba(255,255,255,0.5)" />
+            <button @click="close" class="p-2 rounded-full hover:bg-black/8 transition-colors">
+              <XIcon class="w-4 h-4" style="color:rgba(20,20,35,0.45)" />
             </button>
           </div>
         </div>
@@ -64,9 +64,9 @@
                     :style="{ background: mood.color + '25' }">
                     <component :is="mood.iconComponent" class="w-3.5 h-3.5" :style="{ color: mood.color }" />
                   </div>
-                  <p class="text-sm font-semibold text-white leading-tight">{{ mood.label }}</p>
+                  <p class="text-sm font-semibold leading-tight" style="color:rgba(20,20,35,0.85)">{{ mood.label }}</p>
                 </div>
-                <p class="text-xs pl-0.5" style="color:rgba(255,255,255,0.45)">{{ mood.sublabel }}</p>
+                <p class="text-xs pl-0.5" style="color:rgba(20,20,35,0.45)">{{ mood.sublabel }}</p>
               </button>
             </div>
 
@@ -76,8 +76,8 @@
                 <PhoneIcon class="w-4 h-4 text-white" />
               </div>
               <div class="flex-1">
-                <p class="text-xs font-medium uppercase tracking-wide mb-0.5" style="color:rgba(255,255,255,0.45)">Krisentelefon · 24/7 · kostenlos</p>
-                <a href="tel:08001110111" class="text-xl font-quicksand font-bold text-white hover:text-red-300 transition-colors">0800 111 0 111</a>
+                <p class="text-xs font-medium uppercase tracking-wide mb-0.5" style="color:rgba(20,20,35,0.45)">Krisentelefon · 24/7 · kostenlos</p>
+                <a href="tel:08001110111" class="text-xl font-quicksand font-bold hover:text-red-600 transition-colors" style="color:rgba(20,20,35,0.9)">0800 111 0 111</a>
               </div>
               <a href="tel:08001110111" class="w-9 h-9 bg-red-500/90 hover:bg-red-500 rounded-xl flex items-center justify-center transition-colors shrink-0">
                 <PhoneCallIcon class="w-4 h-4 text-white" />
@@ -91,7 +91,7 @@
 
             <!-- Personal message -->
             <div class="rounded-2xl p-5 message-card" :style="{ borderColor: currentMood.color + '35' }">
-              <p class="text-sm leading-[1.75]" style="color:rgba(255,255,255,0.88)">{{ currentMood.message }}</p>
+              <p class="text-sm leading-[1.75]" style="color:rgba(20,20,35,0.78)">{{ currentMood.message }}</p>
             </div>
 
             <!-- Crisis hotline (elevated for suicidal) -->
@@ -101,7 +101,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-xs font-medium uppercase tracking-wide text-red-400 mb-0.5">Krisentelefon · Jetzt anrufen</p>
-                <a href="tel:08001110111" class="text-2xl font-quicksand font-bold text-white hover:text-red-300 transition-colors block leading-tight">0800 111 0 111</a>
+                <a href="tel:08001110111" class="text-2xl font-quicksand font-bold hover:text-red-700 transition-colors block leading-tight" style="color:rgba(20,20,35,0.9)">0800 111 0 111</a>
               </div>
               <a href="tel:08001110111" class="shrink-0 w-10 h-10 bg-red-500 hover:bg-red-600 transition-colors rounded-xl flex items-center justify-center">
                 <PhoneCallIcon class="w-5 h-5 text-white" />
@@ -112,12 +112,12 @@
             <div class="rounded-2xl p-4 section-card">
               <div class="flex items-center gap-2 mb-4">
                 <WindIcon class="w-4 h-4" :style="{ color: currentMood.color }" />
-                <p class="text-sm font-semibold text-white">{{ currentMood.breathingTitle }}</p>
+                <p class="text-sm font-semibold" style="color:rgba(20,20,35,0.85)">{{ currentMood.breathingTitle }}</p>
                 <button @click="toggleBreathing"
                   class="ml-auto text-xs px-3 py-1 rounded-full transition-all font-semibold"
                   :style="breathingActive
-                    ? { background: currentMood.color + '35', color: currentMood.color }
-                    : { background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.55)' }">
+                    ? { background: currentMood.color + '25', color: currentMood.color }
+                    : { background: 'rgba(0,0,0,0.07)', color: 'rgba(20,20,35,0.5)' }">
                   {{ breathingActive ? 'Stopp' : 'Start' }}
                 </button>
               </div>
@@ -128,18 +128,18 @@
                     <span class="text-xs font-bold select-none" :style="{ color: currentMood.color }">{{ breathingActive ? breathingCount : '·' }}</span>
                   </div>
                 </div>
-                <p class="text-sm font-medium text-center transition-all duration-500" style="color:rgba(255,255,255,0.65)">
+                <p class="text-sm font-medium text-center transition-all duration-500" style="color:rgba(20,20,35,0.6)">
                   {{ breathingActive ? breathingLabel : 'Drücke Start für eine Atemübung' }}
                 </p>
               </div>
-              <p class="text-xs text-center mt-3" style="color:rgba(255,255,255,0.3)">Einatmen 4s · Halten 7s · Ausatmen 8s</p>
+              <p class="text-xs text-center mt-3" style="color:rgba(20,20,35,0.3)">Einatmen 4s · Halten 7s · Ausatmen 8s</p>
             </div>
 
             <!-- Grounding -->
             <div class="rounded-2xl p-4 section-card">
               <div class="flex items-center gap-2 mb-3">
                 <AnchorIcon class="w-4 h-4" :style="{ color: currentMood.color }" />
-                <p class="text-sm font-semibold text-white">5-4-3-2-1 Erdung</p>
+                <p class="text-sm font-semibold" style="color:rgba(20,20,35,0.85)">5-4-3-2-1 Erdung</p>
               </div>
               <div class="space-y-2.5">
                 <div v-for="(gstep, i) in groundingSteps" :key="i"
@@ -151,8 +151,8 @@
                     <CheckIcon v-if="groundingDone[i]" class="w-3 h-3 text-white" />
                   </div>
                   <p class="text-sm transition-all duration-200 leading-snug"
-                    :style="groundingDone[i] ? { color: 'rgba(255,255,255,0.25)', textDecoration: 'line-through' } : { color: 'rgba(255,255,255,0.72)' }">
-                    <span class="font-semibold" :style="{ color: groundingDone[i] ? 'rgba(255,255,255,0.25)' : currentMood.color }">{{ gstep.num }}</span>
+                    :style="groundingDone[i] ? { color: 'rgba(20,20,35,0.25)', textDecoration: 'line-through' } : { color: 'rgba(20,20,35,0.72)' }">
+                    <span class="font-semibold" :style="{ color: groundingDone[i] ? 'rgba(20,20,35,0.25)' : currentMood.color }">{{ gstep.num }}</span>
                     {{ gstep.text }}
                   </p>
                 </div>
@@ -163,14 +163,14 @@
             <div class="rounded-2xl p-4 section-card">
               <div class="flex items-center gap-2 mb-3">
                 <component :is="currentMood.iconComponent" class="w-4 h-4" :style="{ color: currentMood.color }" />
-                <p class="text-sm font-semibold text-white">Was gerade helfen kann</p>
+                <p class="text-sm font-semibold" style="color:rgba(20,20,35,0.85)">Was gerade helfen kann</p>
               </div>
               <div class="space-y-3">
                 <div v-for="(tip, i) in currentMood.tips" :key="i" class="flex gap-3">
                   <div class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" :style="{ background: currentMood.color }" />
                   <div>
-                    <p class="text-sm font-semibold text-white leading-tight">{{ tip.title }}</p>
-                    <p class="text-xs mt-0.5 leading-relaxed" style="color:rgba(255,255,255,0.5)">{{ tip.desc }}</p>
+                    <p class="text-sm font-semibold leading-tight" style="color:rgba(20,20,35,0.85)">{{ tip.title }}</p>
+                    <p class="text-xs mt-0.5 leading-relaxed" style="color:rgba(20,20,35,0.5)">{{ tip.desc }}</p>
                   </div>
                 </div>
               </div>
@@ -180,7 +180,7 @@
             <div class="rounded-2xl p-4 section-card">
               <div class="flex items-center gap-2 mb-3">
                 <ExternalLinkIcon class="w-4 h-4" :style="{ color: currentMood.color }" />
-                <p class="text-sm font-semibold text-white">Hilfsangebote</p>
+                <p class="text-sm font-semibold" style="color:rgba(20,20,35,0.85)">Hilfsangebote</p>
               </div>
               <div class="space-y-2">
                 <a v-for="(link, i) in currentMood.resources" :key="i"
@@ -191,10 +191,10 @@
                     <component :is="link.icon" class="w-3.5 h-3.5" :style="{ color: currentMood.color }" />
                   </div>
                   <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-white leading-tight truncate">{{ link.title }}</p>
-                    <p class="text-xs truncate" style="color:rgba(255,255,255,0.4)">{{ link.subtitle }}</p>
+                    <p class="text-sm font-semibold leading-tight truncate" style="color:rgba(20,20,35,0.85)">{{ link.title }}</p>
+                    <p class="text-xs truncate" style="color:rgba(20,20,35,0.42)">{{ link.subtitle }}</p>
                   </div>
-                  <ArrowRightIcon class="w-3.5 h-3.5 shrink-0 transition-all group-hover:translate-x-0.5" style="color:rgba(255,255,255,0.25)" />
+                  <ArrowRightIcon class="w-3.5 h-3.5 shrink-0 transition-all group-hover:translate-x-0.5" style="color:rgba(20,20,35,0.25)" />
                 </a>
               </div>
             </div>
@@ -205,8 +205,8 @@
                 <PhoneIcon class="w-4 h-4 text-white" />
               </div>
               <div class="flex-1">
-                <p class="text-xs font-medium uppercase tracking-wide mb-0.5" style="color:rgba(255,255,255,0.4)">Krisentelefon · 24/7 · kostenlos</p>
-                <a href="tel:08001110111" class="text-xl font-quicksand font-bold text-white hover:text-red-300 transition-colors">0800 111 0 111</a>
+                <p class="text-xs font-medium uppercase tracking-wide mb-0.5" style="color:rgba(20,20,35,0.42)">Krisentelefon · 24/7 · kostenlos</p>
+                <a href="tel:08001110111" class="text-xl font-quicksand font-bold hover:text-red-600 transition-colors" style="color:rgba(20,20,35,0.9)">0800 111 0 111</a>
               </div>
               <a href="tel:08001110111" class="w-9 h-9 bg-red-500/90 hover:bg-red-500 rounded-xl flex items-center justify-center transition-colors shrink-0">
                 <PhoneCallIcon class="w-4 h-4 text-white" />
@@ -215,8 +215,8 @@
 
             <!-- Back -->
             <button @click="goBack"
-              class="w-full py-2.5 rounded-2xl text-sm transition-all hover:bg-white/8"
-              style="color:rgba(255,255,255,0.3); background:rgba(255,255,255,0.04)">
+              class="w-full py-2.5 rounded-2xl text-sm transition-all"
+              style="color:rgba(20,20,35,0.38); background:rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.06)">
               ← Andere Stimmung wählen
             </button>
 
@@ -598,56 +598,83 @@ defineExpose({ open, close })
 </script>
 
 <style scoped>
-.modal-glass {
-  background: rgba(13, 13, 20, 0.88);
-  backdrop-filter: blur(32px) saturate(1.4);
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset;
+/* Light glassmorphism — matches the app's global .glass system */
+.modal-glass-light {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(36px) saturate(190%) brightness(1.08);
+  -webkit-backdrop-filter: blur(36px) saturate(190%) brightness(1.08);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.18),
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+/* Drag handle */
+.modal-glass-light .w-10.h-1 {
+  background: rgba(0, 0, 0, 0.12);
 }
 
 .ambient-orb {
   position: absolute; border-radius: 50%; pointer-events: none;
   animation: orbFloat 9s ease-in-out infinite; transition: background 2.5s ease;
 }
-.orb-1 { width:650px; height:650px; top:-25%; left:-25%; opacity:0.55; }
-.orb-2 { width:420px; height:420px; bottom:-5%; right:-15%; opacity:0.35; animation-delay:-4.5s; }
+.orb-1 { width:650px; height:650px; top:-25%; left:-25%; opacity:0.45; }
+.orb-2 { width:420px; height:420px; bottom:-5%; right:-15%; opacity:0.28; animation-delay:-4.5s; }
 @keyframes orbFloat {
   0%,100% { transform: translateY(0) scale(1); }
   50%      { transform: translateY(-28px) scale(1.04); }
 }
 
+/* Mood selection cards */
 .mood-card {
-  background: var(--mood-bg, rgba(255,255,255,0.05));
-  border: 1px solid rgba(255,255,255,0.07);
+  background: var(--mood-bg, rgba(255,255,255,0.45));
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
 }
 .mood-card:hover {
   border-color: var(--mood-color);
-  box-shadow: 0 0 0 1px var(--mood-color), 0 8px 28px rgba(0,0,0,0.35);
+  box-shadow: 0 0 0 1px var(--mood-color), 0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.6);
 }
 
+/* Content section cards */
 .section-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 .message-card {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.38);
   border: 1px solid;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
+
+/* Hotline cards — retain red tint but lighter */
 .hotline-card {
-  background: rgba(239,68,68,0.09);
-  border: 1px solid rgba(239,68,68,0.22);
+  background: rgba(254, 226, 226, 0.55);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
 }
 .hotline-prominent {
-  background: rgba(239,68,68,0.14);
-  border: 1px solid rgba(239,68,68,0.38);
-  box-shadow: 0 0 28px rgba(239,68,68,0.12);
+  background: rgba(254, 202, 202, 0.62);
+  border: 1px solid rgba(239, 68, 68, 0.42);
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.1), inset 0 1px 0 rgba(255,255,255,0.5);
 }
-.resource-row {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-}
-.resource-row:hover { background: rgba(255,255,255,0.07); }
 
+/* Resource link rows */
+.resource-row {
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+}
+.resource-row:hover {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+/* Breathing start/stop button uses inline :style — no override needed */
+
+/* Transitions */
 .step-fade-enter-active { transition: opacity .32s ease, transform .32s cubic-bezier(.34,1.1,.64,1); }
 .step-fade-leave-active { transition: opacity .18s ease, transform .18s ease; }
 .step-fade-enter-from   { opacity:0; transform:translateX(14px); }
@@ -660,5 +687,5 @@ defineExpose({ open, close })
 
 .overflow-y-auto::-webkit-scrollbar       { width:3px; }
 .overflow-y-auto::-webkit-scrollbar-track { background:transparent; }
-.overflow-y-auto::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08); border-radius:2px; }
+.overflow-y-auto::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.12); border-radius:2px; }
 </style>
