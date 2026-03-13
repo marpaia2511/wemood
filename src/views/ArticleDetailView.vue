@@ -21,10 +21,10 @@
 
     <template v-else>
 
-      <!-- AppHeader (colleague addition) -->
+      <!-- AppHeader -->
       <AppHeader @open-emergency="$emit('openEmergency')" />
 
-      <!-- Fortschrittsanzeige -->
+      <!-- Progress indicators -->
       <div class="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
         <button
             v-for="(screen, index) in screens"
@@ -43,7 +43,7 @@
         </button>
       </div>
 
-      <!-- Favorite button (preserved from original — floated top-right) -->
+      <!-- Favorite button -->
       <div class="flex justify-end mb-2 max-w-5xl mx-auto">
         <button
             @click="toggleFavorite"
@@ -206,24 +206,168 @@
                 </div>
               </div>
 
-              <!-- Colleague: centered back button with ArrowLeft -->
-              <div class="flex justify-center">
-                <button
-                    @click="goBack"
-                    class="flex items-center gap-2 px-5 py-2.5 bg-violet-600/90 text-white
-                           rounded-full hover:bg-violet-600 transition-colors"
-                >
-                  <ArrowLeftIcon class="w-4 h-4" />
-                  <span class="text-sm">Zurück</span>
+              <div class="flex justify-between">
+                <button @click="scrollToScreen(2)" class="nav-btn">
+                  <ChevronLeftIcon class="w-4 h-4 text-violet-500" />
+                  <span class="text-sm text-gray-700">Zurück</span>
+                </button>
+                <button @click="scrollToScreen(4)" class="nav-btn">
+                  <span class="text-sm text-gray-700">Bewertung</span>
+                  <ChevronRightIcon class="w-4 h-4 text-violet-500" />
                 </button>
               </div>
+            </div>
+          </div>
+
+          <!-- Card 5: Bewertung -->
+          <div class="w-full flex-shrink-0 snap-center">
+            <div class="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-10">
+
+              <div class="text-center mb-6 sm:mb-8">
+                <StarIcon class="w-10 h-10 text-violet-400 mx-auto mb-3" />
+                <h2 class="text-2xl sm:text-3xl font-quicksand font-semibold text-gray-800 nav-label">
+                  Artikel bewerten
+                </h2>
+                <p class="text-sm text-violet-500 mt-2">
+                  Deine Bewertung hilft uns, die Qualität der Inhalte zu verbessern.
+                </p>
+              </div>
+
+              <!-- Not logged in -->
+              <div v-if="!isLoggedIn" class="flex flex-col items-center gap-4 py-6 text-center">
+                <div class="w-14 h-14 glass-subtle rounded-2xl flex items-center justify-center">
+                  <UserIcon class="w-7 h-7 text-violet-300" />
+                </div>
+                <p class="text-violet-600 text-sm leading-relaxed">
+                  Melde dich an, um diesen Artikel zu bewerten.
+                </p>
+                <router-link to="/login" class="px-5 py-2.5 bg-violet-600/90 text-white rounded-full text-sm font-semibold hover:bg-violet-600 transition-colors">
+                  Anmelden
+                </router-link>
+              </div>
+
+              <!-- Logged in -->
+              <div v-else>
+
+                <!-- Overall average -->
+                <div v-if="ratingSummary.count > 0" class="flex items-center justify-center gap-3 mb-6 glass-subtle rounded-2xl p-3">
+                  <div class="flex items-center gap-1">
+                    <StarIcon
+                      v-for="s in 5" :key="s"
+                      class="w-4 h-4"
+                      :class="s <= Math.round(ratingSummary.average) ? 'text-amber-400 fill-amber-400' : 'text-gray-300'"
+                    />
+                  </div>
+                  <span class="text-sm font-semibold text-gray-700">{{ ratingSummary.average }}</span>
+                  <span class="text-xs text-gray-500">({{ ratingSummary.count }} {{ ratingSummary.count === 1 ? 'Bewertung' : 'Bewertungen' }})</span>
+                </div>
+
+                <!-- Already rated -->
+                <div v-if="existingRating" class="space-y-4">
+                  <div class="glass-subtle rounded-2xl p-5">
+                    <p class="text-xs text-gray-500 mb-2">Deine Bewertung</p>
+                    <div class="flex items-center gap-1 mb-3">
+                      <StarIcon
+                        v-for="s in 5" :key="s"
+                        class="w-6 h-6"
+                        :class="s <= existingRating.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'"
+                      />
+                    </div>
+                    <p v-if="existingRating.comment" class="text-sm text-violet-600 leading-relaxed italic">
+                      „{{ existingRating.comment }}"
+                    </p>
+                    <p v-else class="text-xs text-gray-400">Kein Kommentar</p>
+                  </div>
+                  <button
+                    @click="handleDeleteRating"
+                    :disabled="ratingLoading"
+                    class="w-full py-2.5 glass hover:bg-red-100/30 text-red-500 text-sm font-medium rounded-2xl transition-all flex items-center justify-center gap-2"
+                  >
+                    <LoaderIcon v-if="ratingLoading" class="w-4 h-4 animate-spin" />
+                    <Trash2Icon v-else class="w-4 h-4" />
+                    Bewertung löschen
+                  </button>
+                </div>
+
+                <!-- New rating form -->
+                <div v-else class="space-y-5">
+
+                  <!-- Stars -->
+                  <div>
+                    <p class="text-sm font-medium text-gray-600 mb-3 text-center">
+                      {{ ratingDraft === 0 ? 'Wie hilfreich war dieser Artikel?' : ratingLabels[ratingDraft - 1] }}
+                    </p>
+                    <div class="flex items-center justify-center gap-2">
+                      <button
+                        v-for="s in 5" :key="s"
+                        @click="ratingDraft = s"
+                        @mouseenter="ratingHover = s"
+                        @mouseleave="ratingHover = 0"
+                        class="transition-transform hover:scale-110 active:scale-95"
+                      >
+                        <StarIcon
+                          class="w-9 h-9 transition-colors"
+                          :class="s <= (ratingHover || ratingDraft) ? 'text-amber-400 fill-amber-400' : 'text-gray-300'"
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Optional comment -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1.5">
+                      Kommentar <span class="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <textarea
+                      v-model="commentDraft"
+                      placeholder="Was hat dir an diesem Artikel gefallen oder gefehlt?"
+                      rows="3"
+                      maxlength="500"
+                      class="w-full glass-subtle rounded-2xl px-4 py-3 text-sm text-violet-700 placeholder:text-gray-400 outline-none focus:bg-white/30 transition-all resize-none"
+                    />
+                    <p class="text-xs text-gray-400 text-right mt-1">{{ commentDraft.length }}/500</p>
+                  </div>
+
+                  <!-- Error -->
+                  <Transition name="fade-slide">
+                    <p v-if="ratingError" class="text-xs text-red-500 ml-1">{{ ratingError }}</p>
+                  </Transition>
+
+                  <button
+                    @click="handleSubmitRating"
+                    :disabled="ratingLoading || ratingDraft === 0"
+                    class="w-full py-3 bg-violet-600/90 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-2xl transition-all flex items-center justify-center gap-2"
+                  >
+                    <LoaderIcon v-if="ratingLoading" class="w-4 h-4 animate-spin" />
+                    <StarIcon v-else class="w-4 h-4" />
+                    Bewertung abschicken
+                  </button>
+                </div>
+
+              </div>
+
+              <!-- Nav -->
+              <div class="flex justify-between mt-6">
+                <button @click="scrollToScreen(3)" class="nav-btn">
+                  <ChevronLeftIcon class="w-4 h-4 text-violet-500" />
+                  <span class="text-sm text-gray-700">Zurück</span>
+                </button>
+                <button
+                  @click="goBack"
+                  class="flex items-center gap-2 px-5 py-2.5 bg-violet-600/90 text-white rounded-full hover:bg-violet-600 transition-colors"
+                >
+                  <ArrowLeftIcon class="w-4 h-4" />
+                  <span class="text-sm">Fertig</span>
+                </button>
+              </div>
+
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- Desktop: fixed left back button (colleague addition) -->
+      <!-- Desktop: fixed left back button -->
       <button
           @click="goBack"
           class="hidden lg:flex fixed left-4 top-1/2 -translate-y-1/2 z-40
@@ -237,7 +381,7 @@
         </span>
       </button>
 
-      <!-- Mobile: inline back button below content (colleague addition) -->
+      <!-- Mobile: inline back button -->
       <div class="lg:hidden mt-8 sm:mt-10 mb-4">
         <button @click="goBack" class="flex items-center gap-1.5 group cursor-pointer">
           <ChevronLeftIcon class="w-10 h-10 text-white/90 nav-icon-dark
@@ -257,29 +401,39 @@
 import { ref, onMounted, onUnmounted, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  ArrowLeft as ArrowLeftIcon,
-  ChevronLeft as ChevronLeftIcon,
+  ArrowLeft    as ArrowLeftIcon,
+  ChevronLeft  as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  BookOpen as BookOpenIcon,
-  PlayCircle as PlayCircleIcon,
-  CheckCircle as CheckCircleIcon,
-  Heart as HeartIcon,
-  Loader as LoaderIcon,
-  AlertCircle as AlertCircleIcon,
+  BookOpen     as BookOpenIcon,
+  PlayCircle   as PlayCircleIcon,
+  CheckCircle  as CheckCircleIcon,
+  Heart        as HeartIcon,
+  Loader       as LoaderIcon,
+  AlertCircle  as AlertCircleIcon,
+  Star         as StarIcon,
+  Trash2       as Trash2Icon,
+  User         as UserIcon,
 } from 'lucide-vue-next'
-import { getArticleById, trackArticleView, addFavorite, removeFavorite, isFavorited } from '../services/api.js'
+import {
+  getArticleById, trackArticleView,
+  addFavorite, removeFavorite, isFavorited,
+  getMyArticleRating, upsertArticleRating,
+  deleteMyArticleRating, getArticleRatingSummary,
+} from '../services/api.js'
+import { useAuth } from '../composables/useAuth.js'
 import AppHeader from '../components/AppHeader.vue'
 
 defineEmits(['openEmergency'])
 
-const route   = useRoute()
-const router  = useRouter()
+const route        = useRoute()
+const router       = useRouter()
 const currentTheme = inject('currentTheme')
+const { isLoggedIn } = useAuth()
 
-// ── Map article category/tags → AnimatedBackground theme name ────────
+// ── Theme mapping ─────────────────────────────────────────────────────
 function categoryToTheme(article) {
-  const cat  = (article.category || '').toLowerCase()
-  const tags = (article.tags || []).join(' ').toLowerCase()
+  const cat      = (article.category || '').toLowerCase()
+  const tags     = (article.tags || []).join(' ').toLowerCase()
   const haystack = cat + ' ' + tags
 
   if (haystack.includes('depress'))                            return 'depression'
@@ -296,35 +450,54 @@ function categoryToTheme(article) {
   if (haystack.includes('dankbar') || haystack.includes('gratit'))                           return 'gratitude'
   if (haystack.includes('freude') || haystack.includes('joy') || haystack.includes('glück'))  return 'joy'
   if (haystack.includes('vertrauen') || haystack.includes('trust'))                          return 'trust'
-  // sentiment-based fallback
   const sentiment = (article.sentiment || '').toLowerCase()
   if (sentiment === 'positive') return 'hope'
   if (sentiment === 'negative') return 'depression'
   return 'calm'
 }
 
-const screens       = ['Überblick', 'Literatur', 'Videos', 'Fazit']
-const currentScreen = ref(0)
-const loading       = ref(true)
-const error         = ref(null)
-const article       = ref({})
-const favorited     = ref(false)
-const favLoading    = ref(false)
+// ── State ─────────────────────────────────────────────────────────────
+const screens         = ['Überblick', 'Literatur', 'Videos', 'Fazit', 'Bewertung']
+const currentScreen   = ref(0)
+const loading         = ref(true)
+const error           = ref(null)
+const article         = ref({})
+const favorited       = ref(false)
+const favLoading      = ref(false)
 const scrollContainer = ref(null)
-let previousTheme = null
+let previousTheme     = null
 
+// Rating state
+const existingRating = ref(null)
+const ratingDraft    = ref(0)
+const ratingHover    = ref(0)
+const commentDraft   = ref('')
+const ratingLoading  = ref(false)
+const ratingError    = ref('')
+const ratingSummary  = ref({ average: null, count: 0 })
+
+const ratingLabels = ['Nicht hilfreich', 'Wenig hilfreich', 'In Ordnung', 'Hilfreich', 'Sehr hilfreich']
+
+// ── Lifecycle ─────────────────────────────────────────────────────────
 onMounted(async () => {
   try {
     const id = Number(route.params.id)
     article.value = await getArticleById(id)
     if (!article.value) throw new Error('Artikel nicht gefunden.')
-    // Save current theme and apply article theme
+
     if (currentTheme) {
       previousTheme = currentTheme.value
       currentTheme.value = categoryToTheme(article.value)
     }
+
     trackArticleView({ articleId: id, articleTitle: article.value.title, articleEmoji: article.value.emoji }).catch(() => {})
     isFavorited(id).then(v => { favorited.value = v }).catch(() => {})
+
+    if (isLoggedIn.value) {
+      getMyArticleRating(id).then(r => { existingRating.value = r }).catch(() => {})
+    }
+    getArticleRatingSummary(id).then(s => { ratingSummary.value = s }).catch(() => {})
+
   } catch (e) {
     error.value = e.message
   } finally {
@@ -333,12 +506,12 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  // Restore previous theme when leaving the article
   if (currentTheme && previousTheme !== null) {
     currentTheme.value = previousTheme
   }
 })
 
+// ── Favorite ──────────────────────────────────────────────────────────
 async function toggleFavorite() {
   if (favLoading.value) return
   favLoading.value = true
@@ -357,10 +530,51 @@ async function toggleFavorite() {
   }
 }
 
+// ── Rating ────────────────────────────────────────────────────────────
+async function handleSubmitRating() {
+  ratingError.value = ''
+  if (ratingDraft.value === 0) {
+    ratingError.value = 'Bitte wähle eine Bewertung aus.'
+    return
+  }
+  ratingLoading.value = true
+  try {
+    const saved = await upsertArticleRating({
+      articleId:    article.value.id,
+      articleTitle: article.value.title,
+      rating:       ratingDraft.value,
+      comment:      commentDraft.value.trim() || null,
+    })
+    existingRating.value = saved
+    ratingDraft.value    = 0
+    commentDraft.value   = ''
+    ratingSummary.value  = await getArticleRatingSummary(article.value.id)
+  } catch (e) {
+    ratingError.value = 'Fehler beim Speichern. Bitte versuche es erneut.'
+    console.warn('[rating]', e)
+  } finally {
+    ratingLoading.value = false
+  }
+}
+
+async function handleDeleteRating() {
+  if (!confirm('Deine Bewertung wirklich löschen?')) return
+  ratingLoading.value = true
+  try {
+    await deleteMyArticleRating(article.value.id)
+    existingRating.value = null
+    ratingSummary.value  = await getArticleRatingSummary(article.value.id)
+  } catch (e) {
+    console.warn('[rating delete]', e)
+  } finally {
+    ratingLoading.value = false
+  }
+}
+
+// ── Scroll ────────────────────────────────────────────────────────────
 function onScroll() {
-  const container   = scrollContainer.value
-  const screenWidth = container.clientWidth
-  currentScreen.value = Math.round(container.scrollLeft / screenWidth)
+  const container = scrollContainer.value
+  currentScreen.value = Math.round(container.scrollLeft / container.clientWidth)
 }
 
 function scrollToScreen(index) {
@@ -391,6 +605,9 @@ function goBack() { router.back() }
 .nav-label-dark { text-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 0 8px rgba(0,0,0,0.15); }
 .nav-label      { text-shadow: 0 1px 4px rgba(255,255,255,0.6), 0 0 12px rgba(255,255,255,0.4); }
 .nav-icon-dark  { filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)); }
+
+.fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.25s ease; }
+.fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateY(-4px); }
 
 div::-webkit-scrollbar { display: none; }
 </style>

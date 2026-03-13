@@ -422,3 +422,76 @@ export async function adminGetAllProfiles() {
   throwIfError(error)
   return data || []
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// ARTICLE RATINGS  →  Supabase
+// Table: article_ratings (id, user_id, article_id, article_title, rating, comment, created_at, updated_at)
+// ─────────────────────────────────────────────────────────────────────
+
+export async function getMyArticleRating(articleId) {
+  const { data, error } = await supabase
+    .from('article_ratings')
+    .select('id, rating, comment, updated_at')
+    .eq('article_id', articleId)
+    .maybeSingle()
+  if (error) return null
+  return data
+}
+
+export async function upsertArticleRating({ articleId, articleTitle, rating, comment = null }) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Nicht eingeloggt')
+  const { data, error } = await supabase
+    .from('article_ratings')
+    .upsert(
+      {
+        user_id:       user.id,
+        article_id:    articleId,
+        article_title: articleTitle,
+        rating,
+        comment:       comment || null,
+        updated_at:    new Date().toISOString(),
+      },
+      { onConflict: 'user_id,article_id' }
+    )
+    .select()
+    .single()
+  throwIfError(error)
+  return data
+}
+
+export async function deleteMyArticleRating(articleId) {
+  const { error } = await supabase
+    .from('article_ratings')
+    .delete()
+    .eq('article_id', articleId)
+  throwIfError(error)
+}
+
+export async function getArticleRatingSummary(articleId) {
+  // Returns average rating and total count for an article (readable by anyone
+  // because we use an aggregate, not individual user rows)
+  const { data, error } = await supabase
+    .from('article_ratings')
+    .select('rating')
+    .eq('article_id', articleId)
+  if (error) return { average: null, count: 0 }
+  if (!data || data.length === 0) return { average: null, count: 0 }
+  const avg = data.reduce((sum, r) => sum + r.rating, 0) / data.length
+  return { average: Math.round(avg * 10) / 10, count: data.length }
+}
+
+// ── Admin: all ratings ────────────────────────────────────────────────
+export async function adminGetAllRatings() {
+  const { data, error } = await supabase
+    .from('article_ratings')
+    .select('id, user_id, article_id, article_title, rating, comment, updated_at')
+    .order('updated_at', { ascending: false })
+  throwIfError(error)
+  return data || []
+}
+
+export async function adminDeleteRating(id) {
+  const { error } = await supabase.from('article_ratings').delete().eq('id', id)
+  throwIfError(error)
+}
