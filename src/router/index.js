@@ -8,6 +8,7 @@ import LoginView         from '../views/LoginView.vue'
 import RegisterView      from '../views/RegisterView.vue'
 import AccountView       from '../views/AccountView.vue'
 import VerifyEmailView   from '../views/VerifyEmailView.vue'
+import AdminView         from '../views/AdminView.vue'
 
 const routes = [
     { path: '/',              name: 'home',         component: HomeView },
@@ -32,6 +33,14 @@ const routes = [
         path: '/account',
         name: 'account',
         component: AccountView,
+        meta: { requiresAuth: true }
+    },
+    {
+        // Admin route — requires auth; role enforcement happens inside AdminView
+        // via Supabase RLS, so access is verified server-side, not just on the client.
+        path: '/admin',
+        name: 'admin',
+        component: AdminView,
         meta: { requiresAuth: true }
     }
 ]

@@ -17,7 +17,7 @@
     </div>
 
     <!-- Tab bar -->
-    <div class="flex items-center gap-1 px-4 sm:px-8 mb-6">
+    <div class="flex items-center gap-1 px-4 sm:px-8 mb-6 flex-wrap">
       <button
         v-for="tab in tabs" :key="tab.key"
         @click="activeTab = tab.key"
@@ -31,7 +31,7 @@
       </button>
     </div>
 
-    <!-- KONTO TAB -->
+    <!-- ── KONTO TAB ── -->
     <div v-if="activeTab === 'konto'" class="px-4 sm:px-8 max-w-xl mx-auto space-y-4 pb-12">
 
       <!-- Profile card -->
@@ -89,6 +89,24 @@
         </div>
       </div>
 
+      <!-- Admin card (visible to admins only) -->
+      <Transition name="fade-slide">
+        <div v-if="userIsAdmin" class="glass-strong rounded-3xl p-6 sm:p-8">
+          <router-link to="/admin" class="w-full flex items-center justify-between group">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 glass-subtle rounded-xl flex items-center justify-center">
+                <ShieldIcon class="w-4 h-4 text-purple-400" />
+              </div>
+              <div>
+                <span class="text-base font-medium text-gray-800 nav-label">Admin-Bereich</span>
+                <p class="text-xs text-gray-500 nav-label-dark">Feedback &amp; Nutzerverwaltung</p>
+              </div>
+            </div>
+            <ChevronRightIcon class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+          </router-link>
+        </div>
+      </Transition>
+
       <!-- Logout card -->
       <div class="glass-strong rounded-3xl p-6 sm:p-8">
         <button @click="handleLogout" class="w-full flex items-center justify-between group">
@@ -103,7 +121,7 @@
       </div>
     </div>
 
-    <!-- FAVORITEN TAB -->
+    <!-- ── FAVORITEN TAB ── -->
     <div v-else-if="activeTab === 'favoriten'" class="px-4 sm:px-8 max-w-xl mx-auto pb-12">
       <div v-if="favLoading" class="flex flex-col items-center justify-center py-20 gap-3">
         <LoaderIcon class="w-7 h-7 text-white/60 animate-spin" />
@@ -137,7 +155,7 @@
       </div>
     </div>
 
-    <!-- VERLAUF TAB -->
+    <!-- ── VERLAUF TAB ── -->
     <div v-else-if="activeTab === 'verlauf'" class="px-4 sm:px-8 max-w-xl mx-auto pb-12">
       <div v-if="historyLoading" class="flex flex-col items-center justify-center py-20 gap-3">
         <LoaderIcon class="w-7 h-7 text-white/60 animate-spin" />
@@ -174,40 +192,135 @@
       </div>
     </div>
 
+    <!-- ── FEEDBACK TAB ── -->
+    <div v-else-if="activeTab === 'feedback'" class="px-4 sm:px-8 max-w-xl mx-auto pb-12">
+      <div class="glass-strong rounded-3xl p-6 sm:p-8">
+        <h2 class="text-base font-semibold text-gray-700 nav-label-dark mb-1">Feedback senden</h2>
+        <p class="text-xs text-gray-500 nav-label-dark mb-5">Dein Feedback hilft uns, WeMood kontinuierlich zu verbessern.</p>
+
+        <!-- Success state — replaces form after submit -->
+        <Transition name="fade-slide">
+          <div v-if="feedbackSuccess" class="flex flex-col items-center gap-4 py-8 text-center">
+            <div class="w-14 h-14 glass-subtle rounded-2xl flex items-center justify-center">
+              <CheckCircleIcon class="w-7 h-7 text-green-500" />
+            </div>
+            <div>
+              <p class="text-base font-semibold text-gray-800 nav-label">Vielen Dank!</p>
+              <p class="text-sm text-gray-500 nav-label-dark mt-1">Dein Feedback wurde übermittelt und wird geprüft.</p>
+            </div>
+            <button
+              @click="resetFeedbackForm"
+              class="mt-2 px-5 py-2 glass hover:bg-white/30 text-gray-700 text-sm font-medium rounded-full transition-all nav-label"
+            >
+              Weiteres Feedback senden
+            </button>
+          </div>
+        </Transition>
+
+        <!-- Form — hidden after success -->
+        <div v-if="!feedbackSuccess">
+          <!-- Category -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-600 nav-label-dark mb-2">Kategorie</label>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="cat in feedbackCategories" :key="cat"
+                @click="feedbackCategory = cat"
+                class="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+                :class="feedbackCategory === cat
+                  ? 'glass border-white/40 text-gray-800 shadow-md bg-white/30 nav-label'
+                  : 'glass-subtle text-gray-600 hover:bg-white/25 nav-label-dark'"
+              >
+                {{ cat }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-600 nav-label-dark mb-1.5">Nachricht</label>
+            <textarea
+              v-model="feedbackMessage"
+              placeholder="Beschreibe dein Anliegen…"
+              rows="4"
+              maxlength="1000"
+              class="w-full glass-subtle rounded-2xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 outline-none focus:bg-white/30 transition-all nav-label-dark resize-none"
+            />
+            <p class="text-xs text-gray-400 nav-label-dark text-right mt-1">{{ feedbackMessage.length }}/1000</p>
+          </div>
+
+          <!-- Error -->
+          <Transition name="fade-slide">
+            <p v-if="feedbackError" class="text-xs text-red-500 mb-3 ml-1 nav-label-dark">{{ feedbackError }}</p>
+          </Transition>
+
+          <button
+            @click="handleSubmitFeedback"
+            :disabled="feedbackLoading || !feedbackMessage.trim() || !feedbackCategory"
+            class="w-full py-3 glass hover:bg-white/30 disabled:opacity-40 disabled:cursor-not-allowed text-gray-800 text-sm font-semibold rounded-2xl transition-all nav-label flex items-center justify-center gap-2"
+          >
+            <LoaderIcon v-if="feedbackLoading" class="w-4 h-4 animate-spin" />
+            <SendIcon v-else class="w-4 h-4" />
+            {{ feedbackLoading ? 'Wird gesendet…' : 'Feedback senden' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  ChevronUp    as ChevronUpIcon,
-  LogOut       as LogOutIcon,
-  ChevronRight as ChevronRightIcon,
-  Loader       as LoaderIcon,
-  CheckCircle  as CheckCircleIcon,
-  Heart        as HeartIcon,
-  Clock        as ClockIcon,
-  User         as UserIcon
+  ChevronUp     as ChevronUpIcon,
+  LogOut        as LogOutIcon,
+  ChevronRight  as ChevronRightIcon,
+  Loader        as LoaderIcon,
+  CheckCircle   as CheckCircleIcon,
+  Heart         as HeartIcon,
+  Clock         as ClockIcon,
+  User          as UserIcon,
+  Send          as SendIcon,
+  MessageSquare as MessageSquareIcon,
+  Shield     as ShieldIcon,
 } from 'lucide-vue-next'
 import { useAuth } from '../composables/useAuth.js'
-import { getFavorites, removeFavorite, getArticleHistory, clearArticleHistory } from '../services/api.js'
+import {
+  getFavorites, removeFavorite,
+  getArticleHistory, clearArticleHistory,
+  submitFeedback,
+  getProfile,
+} from '../services/api.js'
 
 const router = useRouter()
 const { currentUser, logout, updateProfile, authLoading } = useAuth()
 
-const activeTab     = ref('konto')
-const newName       = ref('')
-const saveSuccess   = ref(false)
-const favorites     = ref([])
-const favLoading    = ref(false)
-const history       = ref([])
+const userIsAdmin = ref(false)
+onMounted(async () => { const p = await getProfile(); userIsAdmin.value = p?.role === 'admin' })
+
+const activeTab      = ref('konto')
+const newName        = ref('')
+const saveSuccess    = ref(false)
+const favorites      = ref([])
+const favLoading     = ref(false)
+const history        = ref([])
 const historyLoading = ref(false)
 
+// Feedback state
+const feedbackCategories = ['Bug Report', 'Feature Request', 'Content Feedback', 'General Feedback']
+const feedbackCategory   = ref('')
+const feedbackMessage    = ref('')
+const feedbackLoading    = ref(false)
+const feedbackError      = ref('')
+const feedbackSuccess    = ref(false)
+
 const tabs = [
-  { key: 'konto',     label: 'Konto',     icon: UserIcon  },
-  { key: 'favoriten', label: 'Favoriten', icon: HeartIcon },
-  { key: 'verlauf',   label: 'Verlauf',   icon: ClockIcon }
+  { key: 'konto',     label: 'Konto',     icon: UserIcon          },
+  { key: 'favoriten', label: 'Favoriten', icon: HeartIcon         },
+  { key: 'verlauf',   label: 'Verlauf',   icon: ClockIcon         },
+  { key: 'feedback',  label: 'Feedback',  icon: MessageSquareIcon },
 ]
 
 const formattedDate = computed(() => {
@@ -220,6 +333,9 @@ const formattedDate = computed(() => {
 watch(activeTab, async (tab) => {
   if (tab === 'favoriten' && favorites.value.length === 0) await loadFavorites()
   if (tab === 'verlauf'   && history.value.length === 0)   await loadHistory()
+  if (tab !== 'feedback') {
+    feedbackError.value = ''
+  }
 })
 
 async function loadFavorites() {
@@ -255,6 +371,42 @@ async function handleUpdateName() {
     saveSuccess.value = true
     setTimeout(() => { saveSuccess.value = false }, 2500)
   }
+}
+
+async function handleSubmitFeedback() {
+  feedbackError.value = ''
+
+  if (!feedbackCategory.value) {
+    feedbackError.value = 'Bitte wähle eine Kategorie aus.'
+    return
+  }
+  if (feedbackMessage.value.trim().length < 10) {
+    feedbackError.value = 'Deine Nachricht ist zu kurz (min. 10 Zeichen).'
+    return
+  }
+
+  feedbackLoading.value = true
+  try {
+    await submitFeedback({
+      category: feedbackCategory.value,
+      message:  feedbackMessage.value.trim(),
+    })
+    feedbackSuccess.value  = true
+    feedbackCategory.value = ''
+    feedbackMessage.value  = ''
+  } catch (e) {
+    feedbackError.value = 'Fehler beim Senden. Bitte versuche es erneut.'
+    console.warn('[feedback]', e)
+  } finally {
+    feedbackLoading.value = false
+  }
+}
+
+function resetFeedbackForm() {
+  feedbackSuccess.value  = false
+  feedbackError.value    = ''
+  feedbackCategory.value = ''
+  feedbackMessage.value  = ''
 }
 
 function handleLogout() {

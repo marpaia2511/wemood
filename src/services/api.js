@@ -344,3 +344,81 @@ export async function clearArticleHistory() {
   const { error } = await supabase.from('article_history').delete().neq('id', 0)
   throwIfError(error)
 }
+// ─────────────────────────────────────────────────────────────────────
+// PROFILES  →  Supabase
+// Table: profiles (id, name, role, created_at)
+// ─────────────────────────────────────────────────────────────────────
+
+export async function getProfile() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, name, role, created_at')
+    .maybeSingle()
+  if (error) return null
+  return data
+}
+
+export async function isAdmin() {
+  const profile = await getProfile()
+  return profile?.role === 'admin'
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// FEEDBACK  →  Supabase
+// Table: feedback (id, user_id, category, message, status, created_at)
+// ─────────────────────────────────────────────────────────────────────
+
+export async function submitFeedback({ category, message }) {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+    .from('feedback')
+    .insert({ category, message, user_id: user?.id ?? null })
+    .select()
+    .single()
+  throwIfError(error)
+  return data
+}
+
+export async function getMyFeedback() {
+  const { data, error } = await supabase
+    .from('feedback')
+    .select('id, category, message, status, created_at')
+    .order('created_at', { ascending: false })
+  throwIfError(error)
+  return data || []
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// ADMIN  →  Supabase (admin role required via RLS)
+// ─────────────────────────────────────────────────────────────────────
+
+export async function adminGetAllFeedback() {
+  const { data, error } = await supabase
+    .from('feedback')
+    .select('id, user_id, category, message, status, created_at')
+    .order('created_at', { ascending: false })
+  throwIfError(error)
+  return data || []
+}
+
+export async function adminDeleteFeedback(id) {
+  const { error } = await supabase.from('feedback').delete().eq('id', id)
+  throwIfError(error)
+}
+
+export async function adminResolveFeedback(id) {
+  const { error } = await supabase
+    .from('feedback')
+    .update({ status: 'resolved' })
+    .eq('id', id)
+  throwIfError(error)
+}
+
+export async function adminGetAllProfiles() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, name, role, created_at')
+    .order('created_at', { ascending: false })
+  throwIfError(error)
+  return data || []
+}
