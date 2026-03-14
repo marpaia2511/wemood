@@ -136,9 +136,7 @@
                     <h4 class="text-xl sm:text-2xl font-quicksand font-bold text-gray-800 nav-label">
                       {{ result.title }}
                     </h4>
-                    <span v-if="result.confidence" class="text-xs sm:text-sm text-gray-500 nav-label-dark">
-                      {{ result.confidence }}% Übereinstimmung
-                    </span>
+
                   </div>
                 </div>
                 <p class="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-3 nav-label-dark">

@@ -389,20 +389,29 @@ watch(searchQuery, (newVal, oldVal) => {
 function dismissBanner() { bannerDismissed.value = true }
 
 const emotions = [
-  { label: 'Fear',      value: 'fear'      },
-  { label: 'Sadness',   value: 'sadness'   },
-  { label: 'Happiness', value: 'happiness' },
-  { label: 'Stress',    value: 'stress'    },
-  { label: 'Energy',    value: 'energy'    },
-  { label: 'Calm',      value: 'calm'      }
+  { label: 'Angst',      value: 'fear'      },
+  { label: 'Traurigkeit', value: 'sadness'  },
+  { label: 'Freude',     value: 'happiness' },
+  { label: 'Stress',     value: 'stress'    },
+  { label: 'Energie',    value: 'energy'    },
+  { label: 'Ruhe',       value: 'calm'      }
 ]
 
 function toggleEmotion(emotion) {
+  // Toggle selection state visually
   if (selectedEmotions.value.includes(emotion)) {
     selectedEmotions.value = selectedEmotions.value.filter(e => e !== emotion)
   } else {
     selectedEmotions.value = [...selectedEmotions.value, emotion]
   }
+  // Find the German label for the search query
+  const emotionObj = emotions.find(e => e.value === emotion)
+  const label = emotionObj?.label || emotion
+  // Set search query to the emotion label and search immediately
+  searchQuery.value = label
+  searchError.value = false
+  showSuggestions.value = false
+  router.push({ name: 'search', query: { q: label, emotions: selectedEmotions.value.join(',') } })
 }
 
 function handleSearch() {
