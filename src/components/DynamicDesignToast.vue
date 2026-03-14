@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import {
   Sparkles as SparklesIcon,
   Info     as InfoIcon,
@@ -109,17 +109,23 @@ const showInfo = ref(false)
 
 const emit = defineEmits(['enabled'])
 
-onMounted(() => {
-  // Only show if: user is logged in, hasn't dismissed permanently,
-  // and dynamic design isn't already set
-  const dismissed = localStorage.getItem(TOAST_KEY) === 'dismissed'
+function maybeShow() {
+  const dismissed  = localStorage.getItem(TOAST_KEY) === 'dismissed'
   const alreadySet = localStorage.getItem('wemood_dynamic_design') !== null
-
   if (isLoggedIn.value && !dismissed && !alreadySet) {
-    // Small delay so it doesn't appear instantly on page load
     setTimeout(() => { visible.value = true }, 2000)
   }
+}
+
+onMounted(() => {
+  // Auth may already be restored by the time we mount
+  maybeShow()
 })
+
+// Auth restores asynchronously — watch for login in case it wasn't ready on mount
+watch(isLoggedIn, (loggedIn) => {
+  if (loggedIn && !visible.value) maybeShow()
+}, { immediate: false })
 
 function dismiss() {
   visible.value = false
