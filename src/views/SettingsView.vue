@@ -139,7 +139,7 @@
 
         <!-- Reduzierte Animationen -->
         <div class="flex items-center justify-between p-3 sm:p-4
-                    glass-subtle rounded-xl sm:rounded-2xl">
+                    glass-subtle rounded-xl sm:rounded-2xl mb-4">
           <div class="flex items-center gap-3">
             <EyeIcon class="w-5 h-5 text-gray-600" />
             <div>
@@ -163,6 +163,31 @@
           </button>
         </div>
 
+        <!-- Dynamisches Design -->
+        <div class="flex items-center justify-between p-3 sm:p-4 glass-subtle rounded-xl sm:rounded-2xl">
+          <div class="flex items-center gap-3">
+            <SparklesIcon class="w-5 h-5 text-violet-500" />
+            <div>
+              <span class="text-base sm:text-lg text-gray-700 font-semibold nav-label block">Dynamisches Design</span>
+              <span class="text-xs text-gray-400">Passt das Farbthema an deine Lesegewohnheiten an</span>
+            </div>
+          </div>
+          <button
+              @click="handleDynamicToggle"
+              :class="[
+              'w-12 sm:w-14 h-6 sm:h-7 rounded-full transition-all relative',
+              dynamicDesignEnabled ? 'bg-violet-600' : 'bg-violet-300'
+            ]"
+          >
+            <div
+                :class="[
+                'w-4 sm:w-5 h-4 sm:h-5 bg-white rounded-full transition-all absolute top-1',
+                dynamicDesignEnabled ? 'right-1' : 'left-1'
+              ]"
+            />
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -176,11 +201,23 @@ import {
   Palette as PaletteIcon,
   Moon as MoonIcon,
   Eye as EyeIcon,
+  Sparkles as SparklesIcon,
   User as UserIcon,
 } from 'lucide-vue-next'
 import { useAuth } from '../composables/useAuth.js'
+import { useDynamicTheme } from '../composables/useDynamicTheme.js'
 
 const { currentUser, isLoggedIn } = useAuth()
+const { dynamicDesignEnabled, toggleEnabled, applyDynamicTheme } = useDynamicTheme()
+
+async function handleDynamicToggle() {
+  toggleEnabled()
+  if (dynamicDesignEnabled.value) {
+    await applyDynamicTheme(currentTheme)
+  } else {
+    currentTheme.value = 'default'
+  }
+}
 
 const currentTheme  = inject('currentTheme')
 const darkMode      = inject('darkMode')

@@ -421,6 +421,7 @@ import {
   deleteMyArticleRating, getArticleRatingSummary,
 } from '../services/api.js'
 import { useAuth } from '../composables/useAuth.js'
+import { useDynamicTheme } from '../composables/useDynamicTheme.js'
 import AppHeader from '../components/AppHeader.vue'
 
 defineEmits(['openEmergency'])
@@ -429,6 +430,7 @@ const route        = useRoute()
 const router       = useRouter()
 const currentTheme = inject('currentTheme')
 const { isLoggedIn } = useAuth()
+const { getRestoreTheme } = useDynamicTheme()
 
 // ── Theme mapping ─────────────────────────────────────────────────────
 function categoryToTheme(article) {
@@ -507,7 +509,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (currentTheme && previousTheme !== null) {
-    currentTheme.value = previousTheme
+    // Restore to dynamic theme if enabled, otherwise original theme
+    currentTheme.value = getRestoreTheme() !== 'default' ? getRestoreTheme() : previousTheme
   }
 })
 
