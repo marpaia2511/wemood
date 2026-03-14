@@ -350,9 +350,12 @@ export async function clearArticleHistory() {
 // ─────────────────────────────────────────────────────────────────────
 
 export async function getProfile() {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
   const { data, error } = await supabase
     .from('profiles')
     .select('id, name, role, created_at')
+    .eq('id', user.id)
     .maybeSingle()
   if (error) return null
   return data
@@ -494,4 +497,14 @@ export async function adminGetAllRatings() {
 export async function adminDeleteRating(id) {
   const { error } = await supabase.from('article_ratings').delete().eq('id', id)
   throwIfError(error)
+}
+// ─────────────────────────────────────────────────────────────────────
+// ACCOUNT DELETION  →  Supabase RPC
+// Calls the security-definer function delete_own_account() which
+// removes all user data and the auth.users row server-side.
+// ─────────────────────────────────────────────────────────────────────
+
+export async function deleteOwnAccount() {
+  const { error } = await supabase.rpc('delete_own_account')
+  if (error) throw new Error(error.message || 'Konto konnte nicht gelöscht werden.')
 }

@@ -119,6 +119,55 @@
           <ChevronRightIcon class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
         </button>
       </div>
+      <!-- Danger zone card -->
+      <div class="glass-strong rounded-3xl p-6 sm:p-8 border border-red-200/30">
+        <h2 class="text-sm font-semibold text-red-400 nav-label-dark mb-3">Gefahrenbereich</h2>
+
+        <!-- Confirm prompt -->
+        <Transition name="fade-slide">
+          <div v-if="showDeleteConfirm" class="mb-4 glass-subtle rounded-2xl p-4 border border-red-200/40">
+            <p class="text-sm text-gray-700 nav-label-dark leading-relaxed mb-1">
+              <span class="font-semibold">Bist du sicher?</span> Dein Konto und alle zugehörigen Daten
+              (Favoriten, Verlauf, Bewertungen, Feedback) werden <span class="font-semibold">unwiderruflich gelöscht.</span>
+            </p>
+            <p class="text-xs text-gray-500 nav-label-dark mb-4">Diese Aktion kann nicht rückgängig gemacht werden.</p>
+            <Transition name="fade-slide">
+              <p v-if="deleteError" class="text-xs text-red-500 mb-3 nav-label-dark">{{ deleteError }}</p>
+            </Transition>
+            <div class="flex gap-2">
+              <button
+                @click="showDeleteConfirm = false"
+                class="flex-1 py-2 glass hover:bg-white/30 text-gray-600 text-sm font-medium rounded-xl transition-all nav-label"
+              >
+                Abbrechen
+              </button>
+              <button
+                @click="handleDeleteAccount"
+                :disabled="deleteLoading"
+                class="flex-1 py-2 bg-red-500/90 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <LoaderIcon v-if="deleteLoading" class="w-3.5 h-3.5 animate-spin" />
+                <Trash2Icon v-else class="w-3.5 h-3.5" />
+                {{ deleteLoading ? 'Wird gelöscht…' : 'Ja, löschen' }}
+              </button>
+            </div>
+          </div>
+        </Transition>
+
+        <button
+          v-if="!showDeleteConfirm"
+          @click="showDeleteConfirm = true"
+          class="w-full flex items-center justify-between group"
+        >
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 glass-subtle rounded-xl flex items-center justify-center">
+              <Trash2Icon class="w-4 h-4 text-red-400" />
+            </div>
+            <span class="text-base font-medium text-gray-800 nav-label">Konto löschen</span>
+          </div>
+          <ChevronRightIcon class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+        </button>
+      </div>
     </div>
 
     <!-- ── FAVORITEN TAB ── -->
@@ -284,6 +333,7 @@ import {
   User          as UserIcon,
   Send          as SendIcon,
   MessageSquare as MessageSquareIcon,
+  Trash2        as Trash2Icon,
   Shield     as ShieldIcon,
 } from 'lucide-vue-next'
 import { useAuth } from '../composables/useAuth.js'
@@ -292,6 +342,7 @@ import {
   getArticleHistory, clearArticleHistory,
   submitFeedback,
   getProfile,
+  deleteOwnAccount,
 } from '../services/api.js'
 
 const router = useRouter()
@@ -315,6 +366,11 @@ const feedbackMessage    = ref('')
 const feedbackLoading    = ref(false)
 const feedbackError      = ref('')
 const feedbackSuccess    = ref(false)
+
+// Account deletion state
+const deleteLoading      = ref(false)
+const deleteError        = ref('')
+const showDeleteConfirm  = ref(false)
 
 const tabs = [
   { key: 'konto',     label: 'Konto',     icon: UserIcon          },
@@ -407,6 +463,23 @@ function resetFeedbackForm() {
   feedbackError.value    = ''
   feedbackCategory.value = ''
   feedbackMessage.value  = ''
+}
+
+async function handleDeleteAccount() {
+  deleteError.value = ''
+  deleteLoading.value = true
+  try {
+    await deleteOwnAccount()
+    // Sign out locally after deletion
+    await logout()
+    router.push('/')
+  } catch (e) {
+    deleteError.value = e.message || 'Fehler beim Löschen. Bitte versuche es erneut.'
+    console.warn('[delete account]', e)
+  } finally {
+    deleteLoading.value = false
+    showDeleteConfirm.value = false
+  }
 }
 
 function handleLogout() {
